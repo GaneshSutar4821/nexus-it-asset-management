@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ticket Details — IT Asset Management System</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    body {
+        font-family: 'Segoe UI', sans-serif;
+        background: #f4f7fc;
+        margin: 20px;
+        color: #333;
+    }
+
+    h2, h3 {
+        color: #1e293b;
+    }
+
+    .nav-back {
+        margin-bottom: 20px;
+    }
+
+    .nav-back button {
+        background: #1e3a8a;
+        color: white;
+        border: none;
+        padding: 10px 18px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    .nav-back button:hover {
+        background: #2563eb;
+    }
+
+    .section {
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    /* Info Grid Layout instead of raw table design */
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .info-item {
+        background: #f8fafc;
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .info-item label {
+        display: block;
+        font-size: 12px;
+        font-weight: 600;
+        color: #64748b;
+        margin-bottom: 4px;
+        text-transform: uppercase;
+    }
+
+    .info-item span {
+        font-size: 15px;
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    /* Action Workflow Controls */
+    .control-actions-bar {
+        display: flex;
+        gap: 12px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        flex-wrap: wrap;
+    }
+
+    .action-btn {
+        padding: 12px 24px;
+        border-radius: 8px;
+        border: none;
+        color: white;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 14px;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+        transition: background 0.2s;
+    }
+
+    .btn-start { background: #eab308; }
+    .btn-start:hover { background: #ca8a04; }
+    .btn-close { background: #22c55e; }
+    .btn-close:hover { background: #16a34a; }
+    .btn-reopen { background: #3b82f6; }
+    .btn-reopen:hover { background: #2563eb; }
+
+    textarea {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        font-family: inherit;
+        font-size: 14px;
+        box-sizing: border-box;
+        resize: vertical;
+    }
+
+    textarea:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    button[type="submit"] {
+        background: #1e293b;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 14px;
+        transition: 0.2s;
+        margin-top: 10px;
+    }
+
+    button[type="submit"]:hover {
+        background: #0f172a;
+    }
+
+    .history-card {
+        border-left: 4px solid #2563eb;
+        background: #f8fafc;
+        padding: 15px;
+        margin-bottom: 12px;
+        border-radius: 0 8px 8px 0;
+        border: 1px solid #e2e8f0;
+        border-left-width: 4px;
+    }
+    
+    .history-card .meta {
+        font-size: 12px;
+        color: #64748b;
+        margin-bottom: 6px;
+        font-weight: 600;
+    }
+</style>
+</head>
+<body>
+
+<div class="nav-back">
+    <button onclick="window.location.href='/tickets'">← Back to Tickets</button>
+</div>
+
+<div class="section">
+    <h2>🛠️ Ticket Details: {{ ticket['Ticket ID'] if ticket['Ticket ID']|string != 'nan' else '-' }}</h2>
+    
+    <div class="info-grid">
+        <div class="info-item"><label>Ticket ID</label><span>{{ ticket['Ticket ID'] if ticket['Ticket ID']|string != 'nan' else '-' }}</span></div>
+        <div class="info-item"><label>Asset ID</label><span>{{ ticket['Asset ID'] if ticket['Asset ID']|string != 'nan' else '-' }}</span></div>
+        <div class="info-item"><label>Status</label><span>{{ ticket['Status'] if ticket['Status']|string != 'nan' else '-' }}</span></div>
+        <div class="info-item"><label>Priority</label><span>{{ ticket['Priority'] if ticket['Priority']|string != 'nan' else '-' }}</span></div>
+        
+        <div class="info-item"><label>Issue</label><span>{{ ticket['Issue'] if ticket['Issue']|string != 'nan' else '-' }}</span></div>
+        <div class="info-item"><label>Assigned To</label><span>{{ ticket['Assigned To'] if ticket['Assigned To'] and ticket['Assigned To']|string != 'nan' else '-' }}</span></div>
+        <div class="info-item"><label>Raised By</label><span>{{ ticket['Raised By'] if ticket['Raised By']|string != 'nan' else '-' }}</span></div>
+        <div class="info-item"><label>Department</label><span>{{ ticket['Department'] if ticket['Department'] and ticket['Department']|string != 'nan' else '-' }}</span></div>
+        
+        <div class="info-item"><label>Open Date</label><span>{{ ticket['Created Date'] if ticket['Created Date']|string != 'nan' else '-' }}</span></div>
+        <div class="info-item"><label>Closed Date</label><span>{{ ticket['Closed Date'] if ticket['Closed Date'] and ticket['Closed Date']|string != 'nan' else '-' }}</span></div>
+        <div class="info-item"><label>Last Updated</label><span>{{ ticket['Last Updated'] if ticket['Last Updated'] and ticket['Last Updated']|string != 'nan' else '-' }}</span></div>
+        <div class="info-item"><label>Other Asset Tickets</label><span>{{ history|length }}</span></div>
+    </div>
+
+    {% if role in ['Admin', 'Technician'] %}
+    <div class="control-actions-bar">
+        {% if ticket['Status'] == 'Open' %}
+            <a href="/start_ticket/{{ ticket['Ticket ID'] }}" class="action-btn btn-start">🟡 Start Work (Mark In Progress)</a>
+            <a href="/close_ticket/{{ ticket['Ticket ID'] }}" class="action-btn btn-close">🟢 Close Ticket Directly</a>
+        {% elif ticket['Status'] == 'In Progress' %}
+            <a href="/close_ticket/{{ ticket['Ticket ID'] }}" class="action-btn btn-close">✅ Complete Resolution &amp; Close Ticket</a>
+        {% elif ticket['Status'] == 'Closed' %}
+            <a href="/reopen_ticket/{{ ticket['Ticket ID'] }}" class="action-btn btn-reopen">🔄 Reopen Ticket</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<div class="section">
+    <h3>Technician Update Terminal</h3>
+    <form method="POST" action="/ticket/{{ ticket['Ticket ID'] }}">
+        <textarea name="notes" rows="6" placeholder="Enter continuous updates, diagnostic checks, or solution summaries here..." {% if role == 'User' and ticket['Status'] == 'Closed' %}disabled{% endif %}>{{ ticket['Notes'] if ticket['Notes'] and ticket['Notes']|string != 'nan' else '' }}</textarea>
+        <br>
+        {% if role in ['Admin', 'Technician'] or ticket['Status'] != 'Closed' %}
+        <button type="submit">💾 Save Log Notes</button>
+        {% endif %}
+    </form>
+</div>
+
+<div class="section">
+    <h3>📋 Previous Asset Resolution Trail</h3>
+    {# 🌟 FIXED: Reconfigured variable dictionary mapping to match keys explicitly served by app.py's view history array loop #}
+    {% if history %}
+        {% for h in history %}
+            <div class="history-card">
+                <div class="meta">Ticket Ref: {{ h['Ticket ID'] }} | Opened: {{ h['Created Date'] }} | Status: {{ h['Status'] }}</div>
+                <div><strong>Reported Problem:</strong> {{ h['Issue'] }}</div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p style="color: #64748b; font-style: italic;">No separate historical troubleshooting logs documented for this item index.</p>
+    {% endif %}
+</div>
+
+</body>
+</html>

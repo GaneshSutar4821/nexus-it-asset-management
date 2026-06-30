@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asset Passport — Mobile Hub</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f1f5f9; margin: 0; padding: 15px; color: #1e293b; }
+        .passport-card { background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border-top: 6px solid #1e3a8a; }
+        .header-title { font-size: 20px; font-weight: bold; color: #1e3a8a; margin: 0 0 5px 0; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; text-transform: uppercase; margin-bottom: 15px; }
+        .badge-active { background: #dcfce7; color: #15803d; }
+        .badge-repair { background: #fef3c7; color: #d97706; }
+        .info-row { display: flex; justify-content: space-between; border-bottom: 1px solid #f1f5f9; padding: 10px 0; font-size: 14px; }
+        .info-row span:first-child { color: #64748b; font-weight: 500; }
+        .info-row span:last-child { color: #0f172a; font-weight: 600; }
+        .ticket-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin-top: 10px; }
+        .btn-back { display: block; text-align: center; background: #1e3a8a; color: white; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-top: 20px; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+    <div class="passport-card">
+        <div class="header-title">📦 Hardware Asset Passport</div>
+        <span class="badge {% if asset.status == 'Active' %}badge-active{% else %}badge-repair{% endif %}">
+            Status: {{ asset.status }}
+        </span>
+
+        <div class="info-row"><span>Asset Tags ID</span><span>{{ asset.asset_id }}</span></div>
+        <div class="info-row"><span>Category Type</span><span>{{ asset.asset_type }}</span></div>
+        <div class="info-row"><span>Brand / Model</span><span>{{ asset.brand }} {{ asset.model }}</span></div>
+        <div class="info-row"><span>Assigned Custodian</span><span>{{ asset.user if asset.user else '-' }}</span></div>
+        <div class="info-row"><span>Department Block</span><span>{{ asset.department if asset.department else '-' }}</span></div>
+        <div class="info-row"><span>Serial Number</span><span>{{ asset.serial_no if asset.serial_no else '-' }}</span></div>
+        <div class="info-row"><span>Warranty Expiration</span><span>{{ asset.warranty_expiry if asset.warranty_expiry else '-' }}</span></div>
+
+        <h3 style="margin: 20px 0 10px 0; font-size: 16px; color: #1e3a8a;">🔧 Recent Support Desk Logs</h3>
+        {% if tickets %}
+            {% for t in tickets %}
+            <div class="ticket-box">
+                <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:bold; color:#64748b;">
+                    <span>Ticket #{{ t.ticket_id }}</span>
+                    <span>{{ t.status }}</span>
+                </div>
+                <div style="font-size:13px; margin-top:4px; font-weight:500;">{{ t.issue }}</div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p style="font-size:13px; color:#64748b; font-style:italic; margin:5px 0 0 0;">No diagnostic fault entries found for this serial cluster.</p>
+        {% endif %}
+
+        <a href="/portal" class="btn-back">← Back to Portal Gateway</a>
+    </div>
+
+</body>
+</html>

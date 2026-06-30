@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Stock & Component Matrix</title>
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; margin: 40px; background-color: #f7fafc; color: #2d3748; }
+        .container { max-width: 950px; margin: 0 auto; background: white; padding: 35px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        h2 { color: #1a202c; border-bottom: 2px solid #edf2f7; padding-bottom: 12px; margin-top: 35px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+        th, td { padding: 14px 18px; border: 1px solid #e2e8f0; text-align: left; }
+        th { background-color: #2d3748; color: white; font-weight: 600; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px; }
+        tr:nth-child(even) { background-color: #f8fafc; }
+        .badge-store { background-color: #e2e8f0; color: #4a5568; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; display: inline-block; }
+        .badge-used { background-color: #4299e1; color: white; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; display: inline-block; }
+        .btn-back { display: inline-block; margin-top: 30px; padding: 12px 24px; background: #4a5568; color: white; text-decoration: none; border-radius: 6px; font-weight: 500; font-size: 14px; transition: background 0.2s; }
+        .btn-back:hover { background: #2d3748; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>💻 Main Equipment Quantities</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Device Type</th>
+                <th>Inactive / In Store Stock</th>
+                <th>Active / In Use</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for hardware_type, counts in device_summary.items() %}
+            <tr>
+                <td><strong>{{ hardware_type }}</strong></td>
+                <td><span class="badge-store">{{ counts.get('Inactive', 0) }} Units</span></td>
+                <td><span class="badge-used">{{ counts.get('Active', 0) }} Units</span></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>⚙️ Internal Components & Spares</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Component Group</th>
+                <th>Inactive / In Store Stock</th>
+                <th>Active / Installed</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for hardware_type, counts in parts_summary.items() %}
+            <tr>
+                <td><strong>{{ hardware_type }}</strong></td>
+                <td><span class="badge-store">{{ counts.get('Inactive', 0) }} Pcs</span></td>
+                <td><span class="badge-used">{{ counts.get('Active', 0) }} Pcs</span></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="/portal" class="btn-back">← Back to Portal Lobby</a>
+</div>
+
+</body>
+</html>

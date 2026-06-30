@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Transaction History — IT Asset Management System</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    body{
+        font-family:'Segoe UI', sans-serif;
+        background:#f4f7fc;
+        margin:20px;
+        color:#333;
+    }
+
+    h2{
+        color:#1e293b;
+        margin-bottom:20px;
+    }
+
+    /* Navigation */
+    .nav-back {
+        margin-bottom: 20px;
+    }
+
+    .nav-back button {
+        background: #1e3a8a;
+        color: white;
+        border: none;
+        padding: 10px 18px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    .nav-back button:hover {
+        background: #2563eb;
+    }
+
+    /* Table Container Section */
+    .table-container {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        overflow-x: auto;
+    }
+
+    table{
+        width:100%;
+        border-collapse:collapse;
+        background:white;
+    }
+
+    th{
+        background:#1e3a8a;
+        color:white;
+        padding:12px;
+        font-weight: 600;
+        text-align: left;
+    }
+
+    td{
+        padding:12px;
+        border-bottom:1px solid #e5e7eb;
+        color: #475569;
+    }
+
+    tr:nth-child(even){
+        background:#f8fafc;
+    }
+
+    tr:hover {
+        background: #f1f5f9;
+    }
+
+    /* Status Action Badges */
+    .badge {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        text-align: center;
+    }
+    .badge-created { background: #bbf7d0; color: #166534; }
+    .badge-assigned { background: #bfdbfe; color: #1e40af; }
+    .badge-returned { background: #fef08a; color: #854d0e; }
+    .badge-updated { background: #e2e8f0; color: #334155; }
+    .badge-deleted { background: #fecaca; color: #991b1b; }
+    .badge-ticket { background: #ffedd5; color: #c2410c; }
+</style>
+</head>
+<body>
+
+<div class="nav-back">
+    <button onclick="window.location.href='/assets'">← Back to Dashboard</button>
+</div>
+
+<div class="table-container">
+    <h2>📜 System Audit Trail & Transaction History</h2>
+    
+    <table>
+        <tr>
+            <th>Transaction ID</th>
+            <th>Asset ID</th>
+            <th>Action</th>
+            <th>Date</th>
+            <th>Remarks</th>
+        </tr>
+
+        {% for row in transactions %}
+        <tr>
+            <td><strong>{{ row['Transaction ID'] }}</strong></td>
+            <td>{{ row['Asset ID'] }}</td>
+            <td>
+                {% if row['Action'] == 'Created' %}
+                    <span class="badge badge-created">Created</span>
+                {% elif row['Action'] == 'Assigned' %}
+                    <span class="badge badge-assigned">Assigned</span>
+                {% elif row['Action'] == 'Returned' %}
+                    <span class="badge badge-returned">Returned</span>
+                {% elif row['Action'] == 'Deleted' %}
+                    <span class="badge badge-deleted">Deleted</span>
+                {% elif 'Ticket' in row['Action'] %}
+                    <span class="badge badge-ticket">{{ row['Action'] }}</span>
+                {% else %}
+                    <span class="badge badge-updated">{{ row['Action'] }}</span>
+                {% endif %}
+            </td>
+            <td>{{ row['Date'] }}</td>
+            <td>{{ row['Remarks'] if row['Remarks'] and row['Remarks']|string != 'nan' else '-' }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+</body>
+</html>

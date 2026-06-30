@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="icon" href="data:,">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus Technology Industries Limited — Portal Gateway</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            background:
+                radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.4), transparent 30%),
+                radial-gradient(circle at 80% 80%, rgba(37, 99, 235, 0.35), transparent 30%),
+                linear-gradient(135deg, #020617, #0f172a, #1e3a8a);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background:
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: moveGrid 20s linear infinite;
+        }
+
+        .user-status-bar {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 10px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            z-index: 20;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+        }
+
+        .user-status-bar span {
+            font-weight: 600;
+            color: #1e3a8a;
+        }
+
+        .logout-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-left: 10px;
+            font-weight: 600;
+        }
+
+        .logout-btn:hover {
+            background: #dc2626;
+        }
+
+        .portal-container {
+            text-align: center;
+            position: relative;
+            z-index: 10;
+            animation: fadeIn 1s ease;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* Hide scrollbar tracks across internal content views */
+        .portal-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .logo {
+            font-size: 70px;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 0 15px #3b82f6);
+            animation: glow 2s infinite alternate;
+        }
+
+        .company-name {
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .system-subtitle {
+            color: #94a3b8;
+            font-size: 18px;
+            margin-bottom: 40px;
+        }
+
+        .modules-grid {
+            display: flex;
+            justify-content: center;
+            align-items: stretch;
+            gap: 25px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .module-card {
+            width: 280px;
+            padding: 40px 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            text-decoration: none;
+            color: #1e293b;
+            transition: all 0.4s ease;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            text-align: center;
+        }
+
+        .module-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(59, 130, 246, 0.5);
+            background: #ffffff;
+        }
+
+        .module-icon {
+            font-size: 50px;
+            margin-bottom: 15px;
+        }
+
+        .module-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #1e3a8a;
+            margin-bottom: 10px;
+        }
+
+        .module-desc {
+            font-size: 13px;
+            color: #64748b;
+            line-height: 1.4;
+        }
+
+        /* Frosted Glass Look for Admin Control Panels */
+        .admin-glass-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            color: white;
+        }
+
+        /* Forms Layout Configurations */
+        .self-service-box {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            margin: 0 auto;
+            text-align: left;
+        }
+
+        .self-service-box h3 {
+            color: #1e3a8a;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 11px;
+            margin-bottom: 15px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        .form-submit-btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .form-submit-btn:hover {
+            background: #1d4ed8;
+        }
+
+        /* Background Circles */
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .circle1 {
+            width: 250px;
+            height: 250px;
+            top: 10%;
+            left: 10%;
+        }
+
+        .circle2 {
+            width: 350px;
+            height: 350px;
+            bottom: 10%;
+            right: 10%;
+        }
+
+        @keyframes moveGrid {
+            0% {
+                transform: translate(0, 0);
+            }
+
+            100% {
+                transform: translate(-50px, -50px);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-25px);
+            }
+        }
+
+        @keyframes glow {
+            from {
+                filter: drop-shadow(0 0 10px #3b82f6);
+            }
+
+            to {
+                filter: drop-shadow(0 0 25px #60a5fa);
+            }
+        }
+
+        /* pulsing keyframes for ticket warning label display */
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7);
+            }
+
+            70% {
+                transform: scale(1.03);
+                box-shadow: 0 0 0 10px rgba(220, 38, 38, 0);
+            }
+
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(220, 38, 38, 0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="circle circle1"></div>
+    <div class="circle circle2"></div>
+
+    <div class="user-status-bar">
+        Welcome, <span>{{ current_user.name }}</span>&nbsp;({{ role }})
+
+        {% if role in ['Admin', 'Technician'] and alert_count > 0 %}
+        <span
+            style="background: #dc2626; color: white; padding: 4px 10px; border-radius: 6px; font-size: 11px; margin-left: 12px; font-weight: bold; display: inline-block; animation: pulse 1.5s infinite; box-shadow: 0 0 10px rgba(220, 38, 38, 0.5);">
+            ⚠️ {{ alert_count }} New Tickets Pending
+        </span>
+        {% endif %}
+
+        <a href="/logout"><button class="logout-btn">Sign Out</button></a>
+    </div>
+
+    <div class="portal-container">
+        <div class="logo">🏢</div>
+        <div class="company-name">Nexus Technology Industries Limited</div>
+        <div class="system-subtitle">Enterprise Applications Portal</div>
+
+        <div class="modules-grid">
+            <a href="/assets" class="module-card">
+                <div>
+                    <div class="module-icon">📦</div>
+                    <div class="module-title">IT Assets</div>
+                    <div class="module-desc">Manage system registries, track hardware lifecycle, and oversee status
+                        loops.</div>
+                </div>
+            </a>
+
+            {% if role in ['Admin', 'Technician'] %}
+            <div class="module-card admin-glass-card">
+                <div>
+                    <div class="module-icon" style="filter: drop-shadow(0 2px 10px rgba(23, 162, 184, 0.5));">⚙️</div>
+                    <div class="module-title" style="color: white;">Spare Parts &amp; Stocks</div>
+                    <div class="module-desc" style="color: #a0aec0; margin-bottom: 18px;">Monitor live stock balances of
+                        RAM modules, system storage drives, laptops, and printers.</div>
+                </div>
+                <a href="{{ url_for('spare_parts') }}"
+                    style="display: inline-block; background-color: #17a2b8; color: white; padding: 11px 24px; text-decoration: none; border-radius: 8px; font-weight: 600; font-family: system-ui, -apple-system, sans-serif; font-size: 13.5px; box-shadow: 0 4px 15px rgba(23, 162, 184, 0.4); transition: all 0.2s ease; letter-spacing: 0.3px;">
+                    View Stock Matrix
+                </a>
+            </div>
+            {% endif %}
+
+            {% if role == 'Admin' %}
+            <div class="module-card admin-glass-card">
+                <div>
+                    <div class="module-icon" style="filter: drop-shadow(0 2px 10px rgba(124, 58, 237, 0.5));">📥</div>
+                    <div class="module-title" style="color: white;">System Controls</div>
+                    <div class="module-desc" style="color: #a0aec0; margin-bottom: 12px;">Authorize procurement
+                        pipelines and pull immediate infrastructure recovery backups.</div>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 8px; width: 100%;">
+                    <a href="/manage_requests"
+                        style="display: block; background: #059669; color: white; padding: 8px 12px; text-decoration: none; border-radius: 6px; font-size: 12.5px; font-weight: 600; box-shadow: 0 3px 10px rgba(5, 150, 105, 0.3); text-align: center;">
+                        Manage User Requests
+                    </a>
+                    <a href="/backup_database"
+                        style="display: block; background: #7c3aed; color: white; padding: 8px 12px; text-decoration: none; border-radius: 6px; font-size: 12.5px; font-weight: 600; box-shadow: 0 3px 10px rgba(124, 58, 237, 0.3); text-align: center;">
+                        Download DB Backup
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+
+            <a href="/settings" class="module-card"
+                style="opacity: 1; cursor: pointer; text-decoration: none; color: inherit; display: block;">
+                <div>
+                    <div class="module-icon">⚙️</div>
+                    <div class="module-title">User Settings</div>
+                    <div class="module-desc">Configure security controls, profile values, and local system preferences.
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        {% if role == 'User' %}
+        <div class="self-service-box">
+            <h3>🚀 Self-Service Asset Request</h3>
+            <form action="/submit_request" method="POST">
+                <label
+                    style="font-weight: 600; font-size: 13px; color: #475569; display: block; margin-bottom: 5px;">Asset
+                    Type Needed:</label>
+                <input type="text" name="asset_type" class="form-input" placeholder="e.g., Laptop, Monitor, Mouse"
+                    required>
+
+                <label
+                    style="font-weight: 600; font-size: 13px; color: #475569; display: block; margin-bottom: 5px;">Reason
+                    / Justification:</label>
+                <textarea name="purpose" class="form-input"
+                    placeholder="Why do you require this specific hardware item?" rows="3" style="resize: none;"
+                    required></textarea>
+
+                <button type="submit" class="form-submit-btn">Submit Procurement Request</button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+
+</body>
+
+</html>

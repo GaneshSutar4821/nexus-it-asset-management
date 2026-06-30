@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="icon" href="data:,">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket Management — Workspace Hub</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f4f7fc;
+            margin: 20px;
+            color: #333;
+        }
+
+        h1 {
+            color: #1e293b;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .back-nav {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .back-btn {
+            background: #1e3a8a;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .back-btn:hover {
+            background: #2563eb;
+        }
+
+        /* Dashboard Cards */
+        .dashboard-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .metric-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border-top: 4px solid #cbd5e1;
+        }
+
+        .metric-card h2 {
+            margin: 0;
+            font-size: 28px;
+            color: #1e293b;
+        }
+
+        .metric-card p {
+            margin: 5px 0 0 0;
+            font-weight: 600;
+            color: #64748b;
+        }
+
+        .open-card {
+            border-top-color: #3b82f6;
+        }
+
+        .progress-card {
+            border-top-color: #f59e0b;
+        }
+
+        .closed-card {
+            border-top-color: #22c55e;
+        }
+
+        .high-card {
+            border-top-color: #ef4444;
+        }
+
+        /* Form & Sections */
+        .section-layout {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            margin-top: 0;
+            color: #1e3a8a;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: 600;
+            font-size: 13px;
+            color: #475569;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        textarea {
+            resize: none;
+        }
+
+        .submit-btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .submit-btn:hover {
+            background: #1d4ed8;
+        }
+
+        /* Tables & Status Badges */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            margin-top: 10px;
+        }
+
+        th {
+            background: #1e3a8a;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 14px;
+        }
+
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .badge-open {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-progress {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .badge-closed {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .priority-high {
+            color: #dc2626;
+            font-weight: bold;
+        }
+
+        .action-link {
+            background: #0284c7;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .action-link:hover {
+            background: #0369a1;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="back-nav">
+        <a href="/assets" class="back-btn">← Back to Asset Inventory</a>
+        <span style="font-weight: bold; color: #475569;">Role Tier View: {{ role }}</span>
+    </div>
+
+    <h1>🎫 Helpdesk Support Ticket Management</h1>
+
+    {% if role in ['Admin', 'Technician'] %}
+    <div class="dashboard-metrics">
+        <div class="metric-card open-card">
+            <h2>{{ open_tickets }}</h2>
+            <p>🔵 Open Tickets</p>
+        </div>
+        <div class="metric-card progress-card">
+            <h2>{{ in_progress_tickets }}</h2>
+            <p>🟡 In Progress</p>
+        </div>
+        <div class="metric-card closed-card">
+            <h2>{{ closed_tickets }}</h2>
+            <p>🟢 Closed Tickets</p>
+        </div>
+        <div class="metric-card high-card">
+            <h2>{{ high_priority }}</h2>
+            <p>🔴 High Priority</p>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if role == 'User' %}
+    <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 20px; align-items: start;">
+    {% else %}
+    <div style="display: grid; grid-template-columns: 1fr; gap: 20px; align-items: start;">
+    {% endif %}
+    
+        <div class="section-layout">
+            <h3 class="section-title">🚀 File a Support Request</h3>
+            <form action="/tickets" method="POST">
+                <div style="margin-bottom: 12px;">
+                    <label>Target Asset ID:</label>
+                    <input list="assets_list" name="asset_id" placeholder="Select or type Asset ID..." required>
+                    <datalist id="assets_list">
+                        {% for aid in asset_ids %}
+                        <option value="{{ aid }}"></option>
+                        {% endfor %}
+                    </datalist>
+                </div>
+
+                <div style="margin-bottom: 12px;">
+                    <label>Core Issue Summary:</label>
+                    <input type="text" name="issue" placeholder="e.g., Laptop Screen Flickering" required>
+                </div>
+
+                <div style="margin-bottom: 12px;">
+                    <label>Priority Level:</label>
+                    <select name="priority">
+                        <option value="Low">Low</option>
+                        <option value="Medium" selected>Medium</option>
+                        <option value="High">High</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 12px;">
+                    <label>Detailed Description of Fault:</label>
+                    <textarea name="description" rows="4" placeholder="Describe the error or failure parameters here..." required></textarea>
+                </div>
+
+                <button type="submit" class="submit-btn" style="width: 100%;">Submit Ticket to IT Support</button>
+            </form>
+        </div>
+
+        <div class="section-layout">
+            <h3 class="section-title">📋 Current Active Tickets Registry</h3>
+
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Ticket ID</th>
+                            <th>Asset ID</th>
+                            <th>Issue</th>
+                            <th>Raised By</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>Last Updated</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for tkt in tickets %}
+                        {% if role in ['Admin', 'Technician'] or tkt['Raised By'] == current_user.name %}
+                        <tr>
+                            <td><strong>{{ tkt['Ticket ID'] }}</strong></td>
+                            <td>{{ tkt['Asset ID'] }}</td>
+                            <td>{{ tkt['Issue'] }}</td>
+                            <td>{{ tkt['Raised By'] }}</td>
+                            <td>
+                                <span class="{% if tkt['Priority'] == 'High' %}priority-high{% endif %}">
+                                    {{ tkt['Priority'] }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge {% if tkt['Status'] == 'Open' %}badge-open{% elif tkt['Status'] == 'In Progress' %}badge-progress{% else %}badge-closed{% endif %}">
+                                    {{ tkt['Status'] }}
+                                </span>
+                            </td>
+                            <td><small>{{ tkt['Last Updated'] }}</small></td>
+                            <td>
+                                <a href="/ticket/{{ tkt['Ticket ID'] }}" class="action-link">
+                                    {% if role in ['Admin', 'Technician'] %}🔧 Respond / Update{% else %}👀 View Details{% endif %}
+                                </a>
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div> </body>
+</html>
