@@ -239,6 +239,26 @@
             bottom: 10%;
             right: 10%;
         }
+        .audit-fab {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #1e3a8a; /* Your primary blue */
+            color: white;
+            padding: 12px 20px;
+            border-radius: 50px; /* Makes it pill-shaped */
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            z-index: 9999; /* Ensures it stays on top of everything */
+            transition: transform 0.2s;
+       }
+
+        .audit-fab:hover {
+            transform: scale(1.05);
+            background-color: #312e81;
+       }
 
         @keyframes moveGrid {
             0% {
@@ -382,6 +402,7 @@
                     </div>
                 </div>
             </a>
+            <a href="/audit_logs" class="audit-fab">📜 View Logs</a>
         </div>
 
         {% if role == 'User' %}
