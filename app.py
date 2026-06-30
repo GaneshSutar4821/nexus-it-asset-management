@@ -114,6 +114,14 @@ class RequestModel(db.Model):
     date_submitted = db.Column(db.String(50))
     status = db.Column(db.String(50), default='Pending')
 
+class AuditLogModel(db.Model):
+    __tablename__ = 'audit_logs'
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(100))
+    action = db.Column(db.String(255))
+    asset_id = db.Column(db.String(100))
+    timestamp = db.Column(db.String(50))
+
 @login_manager.user_loader
 def load_user(username):
     return UserModel.query.get(str(username))
@@ -138,6 +146,16 @@ def add_transaction(asset_id, action, remarks=""):
         action=action,
         date=datetime.now().strftime("%d/%m/%Y"),
         remarks=remarks
+    )
+    db.session.add(new_log)
+    db.session.commit()
+
+def log_audit(action, asset_id):
+    new_log = AuditLogModel(
+        username=current_user.username,
+        action=action,
+        asset_id=asset_id,
+        timestamp=datetime.now().strftime("%d/%m/%Y %H:%M:%S")
     )
     db.session.add(new_log)
     db.session.commit()
@@ -409,6 +427,9 @@ def update():
         
         add_transaction(asset_id, "Updated", "Asset Information Updated")
         db.session.commit()
+        
+        # 🟢 NEW: Log this action for your Audit Trail
+        log_audit("Updated asset details", asset_id)
 
     return redirect("/assets")
 
@@ -1389,6 +1410,16 @@ def get_asset_details(asset_id):
             'department': asset.department if asset.department else "N/A"
         })
     return jsonify({'user': '', 'department': ''})
+
+@app.route("/audit_logs")
+@login_required
+@role_required(['Admin'])
+def audit_logs():
+    # Fetch logs, newest first
+    logs = AuditLogModel.query.order_by(AuditLogModel.id.desc()).all()
+    alert_count = TicketModel.query.filter_by(status="Open").count()
+    
+    return render_template("audit_logs.html", logs=logs, role=current_user.role, alert_count=alert_count)
 
 if __name__ == "__main__":
     with app.app_context():
