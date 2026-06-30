@@ -458,7 +458,8 @@ def load_asset():
     qr_base64 = None
     if selected_asset:
         asset_id_target = selected_asset.get("Assets Id", "")
-        qr_data = f"http://10.47.202.70:5000/m/asset/{asset_id_target}"
+        # Updated to dynamic URL
+        qr_data = f"{request.host_url.rstrip('/')}/m/asset/{asset_id_target}"
         qr = qrcode.QRCode(version=1, box_size=3, border=2)
         qr.add_data(qr_data)
         qr.make(fit=True)
@@ -1258,6 +1259,7 @@ def mobile_asset_passport(asset_id):
         tickets=tickets,
         role=current_user.role
     )
+
 @app.route("/download_sticker/<asset_id>")
 @login_required
 def download_sticker(asset_id):
@@ -1265,7 +1267,7 @@ def download_sticker(asset_id):
     asset = AssetModel.query.get_or_404(asset_id)
     
     # 1. Generate the fresh QR code link targeting the mobile passport view
-    qr_data = f"http://10.47.202.70:5000/m/asset/{asset.asset_id}"
+    qr_data = f"{request.host_url.rstrip('/')}/m/asset/{asset.asset_id}"
     qr = qrcode.QRCode(version=1, box_size=10, border=1) # High resolution for printing
     qr.add_data(qr_data)
     qr.make(fit=True)
@@ -1332,6 +1334,7 @@ def download_sticker(asset_id):
         download_name=f"sticker_{asset.asset_id}.pdf",
         mimetype="application/pdf"
     )
+
 @app.route("/settings", methods=["GET", "POST"])
 @login_required
 def settings():
@@ -1371,6 +1374,7 @@ def settings():
         return redirect("/settings")
 
     return render_template("settings.html")
+
 from flask import jsonify
 
 @app.route('/get_asset_details/<asset_id>')
@@ -1385,6 +1389,7 @@ def get_asset_details(asset_id):
             'department': asset.department if asset.department else "N/A"
         })
     return jsonify({'user': '', 'department': ''})
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()  
