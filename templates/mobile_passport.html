@@ -4,52 +4,74 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Asset Passport — Mobile Hub</title>
+    <!-- Adding a modern font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f1f5f9; margin: 0; padding: 15px; color: #1e293b; }
-        .passport-card { background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border-top: 6px solid #1e3a8a; }
-        .header-title { font-size: 20px; font-weight: bold; color: #1e3a8a; margin: 0 0 5px 0; }
-        .badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; text-transform: uppercase; margin-bottom: 15px; }
-        .badge-active { background: #dcfce7; color: #15803d; }
-        .badge-repair { background: #fef3c7; color: #d97706; }
-        .info-row { display: flex; justify-content: space-between; border-bottom: 1px solid #f1f5f9; padding: 10px 0; font-size: 14px; }
+        :root { --primary: #1e3a8a; --bg: #f8fafc; --card: #ffffff; }
+        body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 20px 15px; color: #1e293b; }
+        
+        .passport-card { 
+            background: var(--card); 
+            border-radius: 20px; 
+            padding: 24px; 
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); 
+            border: 1px solid #e2e8f0;
+        }
+        
+        .header-title { font-size: 18px; font-weight: 700; color: #64748b; margin-bottom: 8px; letter-spacing: -0.02em; }
+        .asset-id { font-size: 28px; font-weight: 800; color: var(--primary); margin-bottom: 16px; }
+        
+        .badge { display: inline-block; padding: 6px 14px; border-radius: 50px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 20px; }
+        .badge-active { background: #dcfce7; color: #166534; }
+        .badge-repair { background: #fee2e2; color: #991b1b; }
+        
+        .section-title { margin: 24px 0 12px 0; font-size: 15px; font-weight: 700; color: var(--primary); display: flex; align-items: center; }
+        
+        .info-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
         .info-row span:first-child { color: #64748b; font-weight: 500; }
-        .info-row span:last-child { color: #0f172a; font-weight: 600; }
-        .ticket-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin-top: 10px; }
-        .btn-back { display: block; text-align: center; background: #1e3a8a; color: white; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-top: 20px; font-size: 14px; }
+        .info-row span:last-child { color: #0f172a; font-weight: 600; text-align: right; }
+        
+        .ticket-box { background: #ffffff; border-left: 4px solid var(--primary); border-radius: 8px; padding: 12px 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; border-left-width: 4px; }
+        .ticket-header { display:flex; justify-content:space-between; font-size:11px; font-weight:700; color:#94a3b8; margin-bottom:4px; }
+        .ticket-issue { font-size: 14px; font-weight: 500; color: #1e293b; }
+        
+        .btn-back { display: block; text-align: center; background: var(--primary); color: white; padding: 14px; border-radius: 12px; text-decoration: none; font-weight: 600; margin-top: 24px; font-size: 14px; transition: background 0.2s; }
+        .btn-back:active { transform: scale(0.98); }
     </style>
 </head>
 <body>
 
     <div class="passport-card">
-        <div class="header-title">📦 Hardware Asset Passport</div>
+        <div class="header-title">HARDWARE ASSET PASSPORT</div>
+        <div class="asset-id">{{ asset.asset_id }}</div>
+        
         <span class="badge {% if asset.status == 'Active' %}badge-active{% else %}badge-repair{% endif %}">
             Status: {{ asset.status }}
         </span>
 
-        <div class="info-row"><span>Asset Tags ID</span><span>{{ asset.asset_id }}</span></div>
-        <div class="info-row"><span>Category Type</span><span>{{ asset.asset_type }}</span></div>
-        <div class="info-row"><span>Brand / Model</span><span>{{ asset.brand }} {{ asset.model }}</span></div>
-        <div class="info-row"><span>Assigned Custodian</span><span>{{ asset.user if asset.user else '-' }}</span></div>
-        <div class="info-row"><span>Department Block</span><span>{{ asset.department if asset.department else '-' }}</span></div>
-        <div class="info-row"><span>Serial Number</span><span>{{ asset.serial_no if asset.serial_no else '-' }}</span></div>
-        <div class="info-row"><span>Warranty Expiration</span><span>{{ asset.warranty_expiry if asset.warranty_expiry else '-' }}</span></div>
+        <div class="info-row"><span>Category</span><span>{{ asset.asset_type }}</span></div>
+        <div class="info-row"><span>Make / Model</span><span>{{ asset.brand }} {{ asset.model }}</span></div>
+        <div class="info-row"><span>Custodian</span><span>{{ asset.user if asset.user else '-' }}</span></div>
+        <div class="info-row"><span>Department</span><span>{{ asset.department if asset.department else '-' }}</span></div>
+        <div class="info-row"><span>Serial No.</span><span>{{ asset.serial_no if asset.serial_no else '-' }}</span></div>
+        <div class="info-row"><span>Warranty End</span><span>{{ asset.warranty_expiry if asset.warranty_expiry else '-' }}</span></div>
 
-        <h3 style="margin: 20px 0 10px 0; font-size: 16px; color: #1e3a8a;">🔧 Recent Support Desk Logs</h3>
+        <div class="section-title">🔧 Recent Support Logs</div>
         {% if tickets %}
             {% for t in tickets %}
             <div class="ticket-box">
-                <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:bold; color:#64748b;">
-                    <span>Ticket #{{ t.ticket_id }}</span>
+                <div class="ticket-header">
+                    <span>{{ t.ticket_id }}</span>
                     <span>{{ t.status }}</span>
                 </div>
-                <div style="font-size:13px; margin-top:4px; font-weight:500;">{{ t.issue }}</div>
+                <div class="ticket-issue">{{ t.issue }}</div>
             </div>
             {% endfor %}
         {% else %}
-            <p style="font-size:13px; color:#64748b; font-style:italic; margin:5px 0 0 0;">No diagnostic fault entries found for this serial cluster.</p>
+            <p style="font-size:13px; color:#64748b; font-style:italic; margin:5px 0 0 0;">No active logs found.</p>
         {% endif %}
 
-        <a href="/portal" class="btn-back">← Back to Portal Gateway</a>
+        <a href="/portal" class="btn-back">← Back to Portal</a>
     </div>
 
 </body>
