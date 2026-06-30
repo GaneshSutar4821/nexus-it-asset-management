@@ -329,9 +329,9 @@
 </head>
 
 <body>
-    <div style="background: yellow; padding: 10px; text-align: center; border: 2px solid red;">
-        <a href="/audit_logs">👉 CLICK HERE TO GO TO AUDIT LOGS (If you see this, the code is deploying!)</a>
-    </div>
+    {% if current_user.role == 'Admin' %}
+    <a href="/audit_logs" class="audit-fab">📜 Audit Logs</a>
+    {% endif %}
 
     <div class="circle circle1"></div>
     <div class="circle circle2"></div>
