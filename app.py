@@ -35,6 +35,11 @@ app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
+# --- DATABASE INITIALIZATION HACK ---
+with app.app_context():
+    db.create_all()
+    print("Database tables created successfully!")
+
 # --- CONFIGURING THE ENCRYPTION INTEGRATIONS ---
 login_manager = LoginManager()
 login_manager.init_app(app)
