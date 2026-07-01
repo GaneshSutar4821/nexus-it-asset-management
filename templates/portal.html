@@ -245,17 +245,14 @@
             bottom: 20px;
             right: 20px;
             background-color: #1e3a8a;
-            /* Your primary blue */
             color: white;
             padding: 12px 20px;
             border-radius: 50px;
-            /* Makes it pill-shaped */
             text-decoration: none;
             font-size: 14px;
             font-weight: bold;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
             z-index: 9999;
-            /* Ensures it stays on top of everything */
             transition: transform 0.2s;
         }
 
@@ -329,7 +326,7 @@
 </head>
 
 <body>
-    {% if current_user.role == 'Admin' %}
+    {% if role == 'Admin' %}
     <a href="/audit_logs" class="audit-fab">📜 Audit Logs</a>
     {% endif %}
 
