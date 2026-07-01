@@ -35,14 +35,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-# --- DATABASE INITIALIZATION ---
-with app.app_context():
-    try:
-        db.create_all()
-        print("Database tables created successfully!")
-    except Exception as e:
-        print(f"Error creating tables: {e}")
-
 # --- CONFIGURING THE ENCRYPTION INTEGRATIONS ---
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -1437,6 +1429,21 @@ def audit_logs():
     alert_count = TicketModel.query.filter_by(status="Open").count()
     
     return render_template("audit_logs.html", logs=logs, role=current_user.role, alert_count=alert_count)
+
+# --- FINAL ROBUST DATABASE INITIALIZATION ---
+with app.app_context():
+    try:
+        db.create_all()
+        # Seed default accounts if they don't exist
+        if not UserModel.query.get("admin"):
+            admin_user = UserModel(username="admin", password_hash=generate_password_hash("admin123"), role="Admin", name="System Administrator", email="admin@nexus.tech")
+            tech1_user = UserModel(username="tech1", password_hash=generate_password_hash("tech123"), role="Technician", name="IT Support Tech 1", email="tech1@nexus.tech")
+            user1_user = UserModel(username="user1", password_hash=generate_password_hash("user123"), role="User", name="Standard User 1", email="user1@nexus.tech")
+            db.session.add_all([admin_user, tech1_user, user1_user])
+            db.session.commit()
+            print("System accounts seeded successfully.")
+    except Exception as e:
+        print(f"Initialization error: {e}")
 
 if __name__ == "__main__":
     with app.app_context():
