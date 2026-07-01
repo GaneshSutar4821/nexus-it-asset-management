@@ -35,10 +35,13 @@ app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-# --- DATABASE INITIALIZATION HACK ---
+# --- DATABASE INITIALIZATION ---
 with app.app_context():
-    db.create_all()
-    print("Database tables created successfully!")
+    try:
+        db.create_all()
+        print("Database tables created successfully!")
+    except Exception as e:
+        print(f"Error creating tables: {e}")
 
 # --- CONFIGURING THE ENCRYPTION INTEGRATIONS ---
 login_manager = LoginManager()
