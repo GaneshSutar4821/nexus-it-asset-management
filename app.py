@@ -213,7 +213,7 @@ def portal():
 @login_required
 def assets():
     # 1. Base query: Start with assets belonging only to the current user
-    query = AssetModel.query.filter_by(user=current_user.username).filter(
+    query = AssetModel.query.filter(
         or_(
             AssetModel.record_status != "DEL",
             AssetModel.record_status == None,
