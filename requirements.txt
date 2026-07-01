@@ -5,3 +5,4 @@ gunicorn
 qrcode
 Pillow
 reportlab
+psycopg2-binary

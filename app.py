@@ -22,7 +22,16 @@ app = Flask(__name__)
 app.secret_key = "it_asset_system_secure_key_2026"
 
 # --- RELATIONAL SQL ENGINE CONFIGURATION ---
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+import os
+
+# Grab the cloud database URL from Render, or use local SQLite if it fails
+db_url = os.environ.get('DATABASE_URL', 'sqlite:///database.db')
+
+# Fix Render's URL format for SQLAlchemy
+if db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql://", 1)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
