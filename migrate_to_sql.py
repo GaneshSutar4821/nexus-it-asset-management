@@ -5,7 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 # Initialize a temporary minimal Flask app context for SQLAlchemy
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://nexus_db_z7ew_user:INBU9yEou8WO1YmbgEHLO5zKf72ezpcY@dpg-d92afrho3t8c73b8hhng-a.ohio-postgres.render.com/nexus_db_z7ew"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
@@ -95,10 +95,8 @@ class RequestModel(db.Model):
 
 def migrate_data():
     with app.app_context():
-        print("🛠️ Initializing SQLite database structures...")
-        db.create_all()
-        
-        # 1. Migrate Users Table
+        print("🛠️ Connecting to Cloud Database...")
+        # 1. Migrate Users Table FIRST
         if os.path.exists("users.xlsx"):
             print("👤 Porting accounts registry...")
             df = pd.read_excel("users.xlsx").fillna("")
@@ -112,27 +110,30 @@ def migrate_data():
                         email=str(row['email'])
                     ))
             db.session.commit()
+            print("✅ Users migrated.")
 
-        # 2. Migrate Assets Table
+        # 2. Migrate Assets Table SECOND
         if os.path.exists("assets.xlsx"):
             print("📦 Porting active warehouse assets inventory...")
             df = pd.read_excel("assets.xlsx").fillna("")
             for _, row in df.iterrows():
-                if not AssetModel.query.filter_by(asset_id=str(row['Assets Id'])).first():
+                asset_id = str(row['Assets Id'])
+                if not AssetModel.query.filter_by(asset_id=asset_id).first():
                     
-                    # Convert raw employee name strings to lower case usernames to align with relational foreign key
                     raw_user = str(row['User']).strip()
-                    if raw_user and raw_user not in ["-", "None", "STORE", "In Store"]:
-                        mapped_username = raw_user.lower().replace(" ", "_")
-                    else:
-                        mapped_username = raw_user
+                    mapped_username = raw_user.lower().replace(" ", "_") if raw_user and raw_user not in ["-", "None", "STORE", "In Store"] else raw_user
+                    
+                    # If the user doesn't exist in our newly migrated users table, 
+                    # we must set it to None to avoid the foreign key error.
+                    user_exists = UserModel.query.filter_by(username=mapped_username).first()
+                    final_user = mapped_username if user_exists else None
 
                     db.session.add(AssetModel(
-                        asset_id=str(row['Assets Id']),
+                        asset_id=asset_id,
                         asset_type=str(row['Type']),
                         brand=str(row['Brand']),
                         model=str(row['Model']),
-                        user=mapped_username,
+                        user=final_user, # Safe to link now
                         department=str(row['Department']),
                         status=str(row['Status']),
                         warranty_period=str(row['Warranty Period']),
@@ -144,11 +145,10 @@ def migrate_data():
                         supplier_name=str(row['Supplier Name']),
                         supplier_invoice_no=str(row['Supplier Invoice No.']),
                         supplier_invoice_date=str(row['Supplier Invoice Date']),
-                        record_status=str(row.get('Record Status', 'Active')),
-                        deleted_date=str(row.get('Deleted Date', '')),
-                        updated_date=str(row.get('Updated Date', ''))
+                        record_status=str(row.get('Record Status', 'Active'))
                     ))
             db.session.commit()
+            print("✅ Assets migrated.")
 
         # 3. Migrate Assignments Table
         if os.path.exists("assignments.xlsx"):
