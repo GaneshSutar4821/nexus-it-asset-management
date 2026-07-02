@@ -1445,36 +1445,47 @@ with app.app_context():
     except Exception as e:
         print(f"Initialization error: {e}")
 
-if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()  
-        
-        admin_exists = UserModel.query.get("admin")
-        if not admin_exists:
-            print("Seeding default system accounts directly into database...")
-            
-            admin_user = UserModel(
-                username="admin",
-                password_hash=generate_password_hash("admin123"),
-                role="Admin", name="System Administrator", email="admin@nexus.tech"
+def auto_provision_users():
+    """Scan all assets and create user accounts for anyone missing one."""
+    print("🔄 Running Auto-Provisioning for asset members...")
+    all_assets = AssetModel.query.all()
+    # Extract unique usernames from assets (ignore empty or placeholder names)
+    unique_usernames = {a.user for a in all_assets if a.user and a.user not in ["-", "None", "STORE", "In Store"]}
+    
+    count = 0
+    for username in unique_usernames:
+        if not UserModel.query.get(username):
+            new_user = UserModel(
+                username=username,
+                password_hash=generate_password_hash("Nexus@2026"), # Default password
+                role="User",
+                name=username.replace("_", " ").title(),
+                email=f"{username}@nexus.tech"
             )
-            
-            tech1_user = UserModel(
-                username="tech1",
-                password_hash=generate_password_hash("tech123"),
-                role="Technician", name="IT Support Tech 1", email="tech1@nexus.tech"
-            )
-            
-            user1_user = UserModel(
-                username="user1",
-                password_hash=generate_password_hash("user123"),
-                role="User", name="Standard User 1", email="user1@nexus.tech"
-            )
-            
-            db.session.add(admin_user)
-            db.session.add(tech1_user)
-            db.session.add(user1_user)
+            db.session.add(new_user)
+            count += 1
+    
+    if count > 0:
+        db.session.commit()
+        print(f"✅ Auto-provisioned {count} new user accounts.")
+    else:
+        print("ℹ️ No new users to provision.")        
+with app.app_context():
+    try:
+        db.create_all()
+        # Seed default accounts if they don't exist
+        if not UserModel.query.get("admin"):
+            admin_user = UserModel(username="admin", password_hash=generate_password_hash("admin123"), role="Admin", name="System Administrator", email="admin@nexus.tech")
+            tech1_user = UserModel(username="tech1", password_hash=generate_password_hash("tech123"), role="Technician", name="IT Support Tech 1", email="tech1@nexus.tech")
+            user1_user = UserModel(username="user1", password_hash=generate_password_hash("user123"), role="User", name="Standard User 1", email="user1@nexus.tech")
+            db.session.add_all([admin_user, tech1_user, user1_user])
             db.session.commit()
-            print("Accounts securely injected!")
-
+            print("System accounts seeded successfully.")
+            
+        # 🌟 EXECUTE AUTOMATIC PROVISIONING HERE Safely inside app context loop
+        auto_provision_users()
+            
+    except Exception as e:
+        print(f"Initialization error: {e}")
+if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
