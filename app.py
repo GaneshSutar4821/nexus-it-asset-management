@@ -413,7 +413,22 @@ def update():
         
         assigned_user = request.form.get("User", "").strip()
         if assigned_user and assigned_user not in ["-", "None", "STORE", "In Store"]:
-            asset.user = assigned_user.lower().replace(" ", "_")
+            username_id = assigned_user.lower().replace(" ", "_")
+            
+            # Look up if the account already exists
+            user_exists = UserModel.query.get(username_id)
+            if not user_exists:
+                # Dynamically provision the user account to protect the database link
+                new_automatic_user = UserModel(
+                    username=username_id,
+                    password_hash=generate_password_hash("Nexus@2026"),
+                    role="User",
+                    name=assigned_user,
+                    email=f"{username_id}@nexus.tech"
+                )
+                db.session.add(new_automatic_user)
+            
+            asset.user = username_id
         else:
             asset.user = assigned_user
 
