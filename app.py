@@ -969,59 +969,52 @@ def action_request(request_id, action_status):
 @login_required
 @role_required(['Admin'])
 def backup_database():
+    import sqlite3
     try:
+        # 1. Create a temporary folder for your backup files
         backup_dir = os.path.join(os.getcwd(), 'backups')
         if not os.path.exists(backup_dir):
             os.makedirs(backup_dir)
             
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        src_file = os.path.join(os.getcwd(), 'instance', 'database.db')
-        
-        if not os.path.exists(src_file):
-            src_file = os.path.join(os.getcwd(), 'database.db')
-            
-        if not os.path.exists(src_file):
-            return "Active runtime database file not located on target engine channels.", 404
-            
         dest_file = os.path.join(backup_dir, f"backup_{timestamp}.db")
-        shutil.copy2(src_file, dest_file)
+        
+        # 2. Open a temporary SQLite backup file to write into
+        local_conn = sqlite3.connect(dest_file)
+        local_cursor = local_conn.cursor()
+        
+        # 3. Re-create the empty assets table structural layout
+        local_cursor.execute("""
+            CREATE TABLE IF NOT EXISTS assets (
+                asset_id TEXT PRIMARY KEY,
+                asset_type TEXT,
+                brand TEXT,
+                model TEXT,
+                user TEXT,
+                department TEXT,
+                status TEXT,
+                record_status TEXT
+            );
+        """)
+        
+        # 4. Fetch the real-time active data rows directly from your Render Cloud
+        live_assets = AssetModel.query.all()
+        
+        # 5. Insert those live values smoothly into your downloaded file
+        for asset in live_assets:
+            local_cursor.execute("""
+                INSERT INTO assets (asset_id, asset_type, brand, model, user, department, status, record_status)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+            """, (asset.asset_id, asset.asset_type, asset.brand, asset.model, asset.user, asset.department, asset.status, asset.record_status))
+            
+        local_conn.commit()
+        local_conn.close()
+        
+        # 6. Hand over the completely fresh database backup file to your browser
         return send_file(dest_file, as_attachment=True, download_name=f"system_backup_{timestamp}.db")
+        
     except Exception as e:
         return f"Infrastructure runtime encountered error while creating system snapshot file: {str(e)}", 500
-
-# ==========================================
-# CENTRAL REPORTING ENGINES (VIEW & DOWNLOAD)
-# ==========================================
-
-def get_report_data(report_type):
-    headers = []
-    rows = []
-    
-    if report_type == "assets":
-        headers = ["Asset ID", "Type", "Brand", "Model", "User", "Department", "Status"]
-        records = AssetModel.query.filter(AssetModel.record_status != "DEL").all()
-        for r in records:
-            rows.append([r.asset_id, r.asset_type, r.brand, r.model, r.user if r.user else "-", r.department, r.status])
-            
-    elif report_type == "assignments":
-        headers = ["Assignment ID", "Asset ID", "Employee Name", "Department", "Assigned Date", "Return Date", "Status"]
-        records = AssignmentModel.query.all()
-        for r in records:
-            rows.append([r.assignment_id, r.asset_id, r.employee_name, r.department, r.assigned_date, r.return_date, r.status])
-            
-    elif report_type == "tickets":
-        headers = ["Ticket ID", "Asset ID", "Issue", "Raised By", "Priority", "Status", "Last Updated"]
-        records = TicketModel.query.order_by(TicketModel.status.desc(), TicketModel.last_updated.desc()).all()
-        for r in records:
-            rows.append([r.ticket_id, r.asset_id, r.issue, r.raised_by, r.priority, r.status, r.last_updated])
-            
-    elif report_type == "transactions":
-        headers = ["Transaction ID", "Asset ID", "Action", "Date", "Remarks"]
-        records = TransactionModel.query.all()
-        for r in records:
-            rows.append([r.transaction_id, r.asset_id, r.action, r.date, r.remarks])
-            
-    return headers, rows
 
 @app.route("/view_report", methods=["GET"])
 @login_required
