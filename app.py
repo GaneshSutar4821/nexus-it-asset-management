@@ -338,7 +338,7 @@ def add():
     if assigned_user_name and assigned_user_name not in ["-", "None", "STORE", "In Store"]:
         username_id = assigned_user_name.lower().replace(" ", "_")
         
-        user_exists = UserModel.query.get(username_id)
+        user_exists = db.session.get(UserModel, username_id)
         if not user_exists:
             default_password = "welcome2026"
             
@@ -415,10 +415,9 @@ def update():
         if assigned_user and assigned_user not in ["-", "None", "STORE", "In Store"]:
             username_id = assigned_user.lower().replace(" ", "_")
             
-            # Look up if the account already exists
-            user_exists = UserModel.query.get(username_id)
+            # Use safe session query instead of legacy get()
+            user_exists = db.session.get(UserModel, username_id)
             if not user_exists:
-                # Dynamically provision the user account to protect the database link
                 new_automatic_user = UserModel(
                     username=username_id,
                     password_hash=generate_password_hash("Nexus@2026"),
@@ -427,6 +426,7 @@ def update():
                     email=f"{username_id}@nexus.tech"
                 )
                 db.session.add(new_automatic_user)
+                db.session.flush()  # 🌟 FORCE the database to create the user account right now
             
             asset.user = username_id
         else:
