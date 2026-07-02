@@ -36,8 +36,9 @@ from flask_mail import Mail, Message
 
 # --- EMAIL ENGINE CONFIGURATION ---
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_PORT'] = 465                         # 🌟 Changed from 587 to 465
+app.config['MAIL_USE_TLS'] = False                    # 🌟 Changed to False
+app.config['MAIL_USE_SSL'] = True                     # 🌟 Added SSL Support
 app.config['MAIL_USERNAME'] = os.environ.get('SYSTEM_EMAIL_USER')
 app.config['MAIL_PASSWORD'] = os.environ.get('SYSTEM_EMAIL_PASS')
 app.config['MAIL_DEFAULT_SENDER'] = ('Nexus IT System', os.environ.get('SYSTEM_EMAIL_USER'))
