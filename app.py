@@ -6,7 +6,7 @@ from io import BytesIO
 from functools import wraps
 import shutil
 
-from flask import Flask, render_template, request, redirect, send_file, url_for, abort, flash
+from flask import Flask, render_template, request, redirect, send_file, url_for, abort, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -22,8 +22,6 @@ app = Flask(__name__)
 app.secret_key = "it_asset_system_secure_key_2026"
 
 # --- RELATIONAL SQL ENGINE CONFIGURATION ---
-import os
-
 # Grab the cloud database URL from Render, or use local SQLite if it fails
 db_url = os.environ.get('DATABASE_URL', 'sqlite:///database.db')
 
@@ -971,7 +969,6 @@ def action_request(request_id, action_status):
 def backup_database():
     import sqlite3
     try:
-        # 1. Create a temporary folder for your backup files
         backup_dir = os.path.join(os.getcwd(), 'backups')
         if not os.path.exists(backup_dir):
             os.makedirs(backup_dir)
@@ -979,42 +976,102 @@ def backup_database():
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         dest_file = os.path.join(backup_dir, f"backup_{timestamp}.db")
         
-        # 2. Open a temporary SQLite backup file to write into
         local_conn = sqlite3.connect(dest_file)
         local_cursor = local_conn.cursor()
         
-        # 3. Re-create the empty assets table structural layout
+        # 1. CREATE TABLES
         local_cursor.execute("""
             CREATE TABLE IF NOT EXISTS assets (
-                asset_id TEXT PRIMARY KEY,
-                asset_type TEXT,
-                brand TEXT,
-                model TEXT,
-                user TEXT,
-                department TEXT,
-                status TEXT,
-                record_status TEXT
+                asset_id TEXT PRIMARY KEY, asset_type TEXT, brand TEXT, model TEXT,
+                user TEXT, department TEXT, status TEXT, record_status TEXT
+            );
+        """)
+        local_cursor.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                username TEXT PRIMARY KEY, password TEXT, role TEXT, record_status TEXT
+            );
+        """)
+        local_cursor.execute("""
+            CREATE TABLE IF NOT EXISTS assignments (
+                assignment_id TEXT PRIMARY KEY, asset_id TEXT, employee_name TEXT,
+                department TEXT, assigned_date TEXT, return_date TEXT, status TEXT
+            );
+        """)
+        local_cursor.execute("""
+            CREATE TABLE IF NOT EXISTS tickets (
+                ticket_id TEXT PRIMARY KEY, asset_id TEXT, issue TEXT,
+                raised_by TEXT, priority TEXT, status TEXT, last_updated TEXT
+            );
+        """)
+        local_cursor.execute("""
+            CREATE TABLE IF NOT EXISTS transactions (
+                transaction_id TEXT PRIMARY KEY, asset_id TEXT, action TEXT,
+                date TEXT, remarks TEXT
             );
         """)
         
-        # 4. Fetch the real-time active data rows directly from your Render Cloud
-        live_assets = AssetModel.query.all()
-        
-        # 5. Insert those live values smoothly into your downloaded file
-        for asset in live_assets:
-            local_cursor.execute("""
-                INSERT INTO assets (asset_id, asset_type, brand, model, user, department, status, record_status)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?);
-            """, (asset.asset_id, asset.asset_type, asset.brand, asset.model, asset.user, asset.department, asset.status, asset.record_status))
+        # 2. POPULATE DATA
+        for asset in AssetModel.query.all():
+            local_cursor.execute("INSERT INTO assets VALUES (?, ?, ?, ?, ?, ?, ?, ?);", 
+                (asset.asset_id, asset.asset_type, asset.brand, asset.model, asset.user, asset.department, asset.status, asset.record_status))
+            
+        for u in UserModel.query.all():
+            local_cursor.execute("INSERT INTO users VALUES (?, ?, ?, ?);", 
+                (u.username, u.password_hash, u.role, "Active"))
+            
+        for a in AssignmentModel.query.all():
+            local_cursor.execute("INSERT INTO assignments VALUES (?, ?, ?, ?, ?, ?, ?);", 
+                (a.assignment_id, a.asset_id, a.employee_name, a.department, str(a.assigned_date), str(a.return_date), a.status))
+            
+        for t in TicketModel.query.all():
+            local_cursor.execute("INSERT INTO tickets VALUES (?, ?, ?, ?, ?, ?, ?);", 
+                (t.ticket_id, t.asset_id, t.issue, t.raised_by, t.priority, t.status, str(t.last_updated)))
+            
+        for tx in TransactionModel.query.all():
+            local_cursor.execute("INSERT INTO transactions VALUES (?, ?, ?, ?, ?);", 
+                (tx.transaction_id, tx.asset_id, tx.action, str(tx.date), tx.remarks))
             
         local_conn.commit()
         local_conn.close()
         
-        # 6. Hand over the completely fresh database backup file to your browser
         return send_file(dest_file, as_attachment=True, download_name=f"system_backup_{timestamp}.db")
         
     except Exception as e:
-        return f"Infrastructure runtime encountered error while creating system snapshot file: {str(e)}", 500
+        return f"Infrastructure backup routine error: {str(e)}", 500
+
+# ==========================================
+# CENTRAL REPORTING ENGINES (VIEW & DOWNLOAD)
+# ==========================================
+
+def get_report_data(report_type):
+    headers = []
+    rows = []
+    
+    if report_type == "assets":
+        headers = ["Asset ID", "Type", "Brand", "Model", "User", "Department", "Status"]
+        records = AssetModel.query.filter(AssetModel.record_status != "DEL").all()
+        for r in records:
+            rows.append([r.asset_id, r.asset_type, r.brand, r.model, r.user if r.user else "-", r.department, r.status])
+            
+    elif report_type == "assignments":
+        headers = ["Assignment ID", "Asset ID", "Employee Name", "Department", "Assigned Date", "Return Date", "Status"]
+        records = AssignmentModel.query.all()
+        for r in records:
+            rows.append([r.assignment_id, r.asset_id, r.employee_name, r.department, r.assigned_date, r.return_date, r.status])
+            
+    elif report_type == "tickets":
+        headers = ["Ticket ID", "Asset ID", "Issue", "Raised By", "Priority", "Status", "Last Updated"]
+        records = TicketModel.query.order_by(TicketModel.status.desc(), TicketModel.last_updated.desc()).all()
+        for r in records:
+            rows.append([r.ticket_id, r.asset_id, r.issue, r.raised_by, r.priority, r.status, r.last_updated])
+            
+    elif report_type == "transactions":
+        headers = ["Transaction ID", "Asset ID", "Action", "Date", "Remarks"]
+        records = TransactionModel.query.all()
+        for r in records:
+            rows.append([r.transaction_id, r.asset_id, r.action, r.date, r.remarks])
+            
+    return headers, rows
 
 @app.route("/view_report", methods=["GET"])
 @login_required
@@ -1288,7 +1345,6 @@ def download_report():
 @login_required
 def mobile_asset_passport(asset_id):
     asset = AssetModel.query.filter_by(asset_id=asset_id).first_or_404()
-    # Fixed lookup query referencing 'ticket_id' to resolve schema tracking bugs
     tickets = TicketModel.query.filter_by(asset_id=asset_id).order_by(TicketModel.ticket_id.desc()).limit(3).all()
     
     return render_template(
@@ -1301,12 +1357,10 @@ def mobile_asset_passport(asset_id):
 @app.route("/download_sticker/<asset_id>")
 @login_required
 def download_sticker(asset_id):
-    # Fetch the asset details from the database
     asset = AssetModel.query.get_or_404(asset_id)
     
-    # 1. Generate the fresh QR code link targeting the mobile passport view
     qr_data = f"{request.host_url.rstrip('/')}/m/asset/{asset.asset_id}"
-    qr = qrcode.QRCode(version=1, box_size=10, border=1) # High resolution for printing
+    qr = qrcode.QRCode(version=1, box_size=10, border=1)
     qr.add_data(qr_data)
     qr.make(fit=True)
     
@@ -1315,10 +1369,8 @@ def download_sticker(asset_id):
     img.save(qr_buffer, format="PNG")
     qr_buffer.seek(0)
     
-    # 2. Build a compact, custom-sized PDF buffer for a standard 2" x 1" or 3" x 2" label sticker
     pdf_buffer = BytesIO()
     
-    # We will use small page dimensions (240 x 140 points) perfect for physical label printers
     from reportlab.lib.pagesizes import inch
     sticker_width = 3.2 * inch
     sticker_height = 2.0 * inch
@@ -1331,7 +1383,6 @@ def download_sticker(asset_id):
     
     styles = getSampleStyleSheet()
     
-    # Custom compact typography sizing for the small sticker area
     style_title = Paragraph(f"<b>NEXUS INDUSTRIES LTD.</b>", styles['Normal'])
     style_title.fontSize = 9
     style_title.textColor = colors.HexColor('#1e3a8a')
@@ -1345,11 +1396,9 @@ def download_sticker(asset_id):
     style_details.fontSize = 8
     style_details.leading = 11
     
-    # Draw the QR code image from memory binary using ReportLab's Image drawing block
     from reportlab.platypus import Image as RLImage
     qr_img_flowable = RLImage(qr_buffer, width=1.1*inch, height=1.1*inch)
     
-    # Structure the sticker layout using a clean 2-column side-by-side grid table
     sticker_table_data = [
         [qr_img_flowable, [style_title, Spacer(1, 6), style_details]]
     ]
@@ -1379,7 +1428,6 @@ def settings():
     if request.method == "POST":
         action = request.form.get("action")
         
-        # Handle Profile Update
         if action == "update_profile":
             name = request.form.get("name", "").strip()
             email = request.form.get("email", "").strip()
@@ -1392,7 +1440,6 @@ def settings():
             else:
                 flash("❌ Name and Email cannot be empty.", "error")
                 
-        # Handle Password Change
         elif action == "change_password":
             current_password = request.form.get("current_password", "").strip()
             new_password = request.form.get("new_password", "").strip()
@@ -1413,14 +1460,10 @@ def settings():
 
     return render_template("settings.html")
 
-from flask import jsonify
-
 @app.route('/get_asset_details/<asset_id>')
 @login_required
 def get_asset_details(asset_id):
-    # Query your database for the specific asset
     asset = AssetModel.query.filter_by(asset_id=asset_id).first()
-    
     if asset:
         return jsonify({
             'user': asset.user if asset.user else "Not Assigned",
@@ -1432,32 +1475,14 @@ def get_asset_details(asset_id):
 @login_required
 @role_required(['Admin'])
 def audit_logs():
-    # Fetch logs, newest first
     logs = AuditLogModel.query.order_by(AuditLogModel.id.desc()).all()
     alert_count = TicketModel.query.filter_by(status="Open").count()
-    
     return render_template("audit_logs.html", logs=logs, role=current_user.role, alert_count=alert_count)
-
-# --- FINAL ROBUST DATABASE INITIALIZATION ---
-with app.app_context():
-    try:
-        db.create_all()
-        # Seed default accounts if they don't exist
-        if not UserModel.query.get("admin"):
-            admin_user = UserModel(username="admin", password_hash=generate_password_hash("admin123"), role="Admin", name="System Administrator", email="admin@nexus.tech")
-            tech1_user = UserModel(username="tech1", password_hash=generate_password_hash("tech123"), role="Technician", name="IT Support Tech 1", email="tech1@nexus.tech")
-            user1_user = UserModel(username="user1", password_hash=generate_password_hash("user123"), role="User", name="Standard User 1", email="user1@nexus.tech")
-            db.session.add_all([admin_user, tech1_user, user1_user])
-            db.session.commit()
-            print("System accounts seeded successfully.")
-    except Exception as e:
-        print(f"Initialization error: {e}")
 
 def auto_provision_users():
     """Scan all assets and create user accounts for anyone missing one."""
     print("🔄 Running Auto-Provisioning for asset members...")
     all_assets = AssetModel.query.all()
-    # Extract unique usernames from assets (ignore empty or placeholder names)
     unique_usernames = {a.user for a in all_assets if a.user and a.user not in ["-", "None", "STORE", "In Store"]}
     
     count = 0
@@ -1465,7 +1490,7 @@ def auto_provision_users():
         if not UserModel.query.get(username):
             new_user = UserModel(
                 username=username,
-                password_hash=generate_password_hash("Nexus@2026"), # Default password
+                password_hash=generate_password_hash("Nexus@2026"),
                 role="User",
                 name=username.replace("_", " ").title(),
                 email=f"{username}@nexus.tech"
@@ -1478,10 +1503,11 @@ def auto_provision_users():
         print(f"✅ Auto-provisioned {count} new user accounts.")
     else:
         print("ℹ️ No new users to provision.")        
+
+# --- FINAL ROBUST DATABASE INITIALIZATION ---
 with app.app_context():
     try:
         db.create_all()
-        # Seed default accounts if they don't exist
         if not UserModel.query.get("admin"):
             admin_user = UserModel(username="admin", password_hash=generate_password_hash("admin123"), role="Admin", name="System Administrator", email="admin@nexus.tech")
             tech1_user = UserModel(username="tech1", password_hash=generate_password_hash("tech123"), role="Technician", name="IT Support Tech 1", email="tech1@nexus.tech")
@@ -1490,10 +1516,10 @@ with app.app_context():
             db.session.commit()
             print("System accounts seeded successfully.")
             
-        # 🌟 EXECUTE AUTOMATIC PROVISIONING HERE Safely inside app context loop
         auto_provision_users()
             
     except Exception as e:
         print(f"Initialization error: {e}")
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
