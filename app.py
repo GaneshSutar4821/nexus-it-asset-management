@@ -32,6 +32,17 @@ if db_url.startswith("postgres://"):
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+from flask_mail import Mail, Message
+
+# --- EMAIL ENGINE CONFIGURATION ---
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = os.environ.get('SYSTEM_EMAIL_USER')
+app.config['MAIL_PASSWORD'] = os.environ.get('SYSTEM_EMAIL_PASS')
+app.config['MAIL_DEFAULT_SENDER'] = ('Nexus IT System', os.environ.get('SYSTEM_EMAIL_USER'))
+
+mail = Mail(app)
 
 # --- CONFIGURING THE ENCRYPTION INTEGRATIONS ---
 login_manager = LoginManager()
@@ -166,6 +177,19 @@ def log_audit(action, asset_id):
     )
     db.session.add(new_log)
     db.session.commit()
+    
+def send_system_email(subject, recipient, body_html):
+    """Safely queues and triggers a system notification email."""
+    try:
+        msg = Message(
+            subject=subject,
+            recipients=[recipient]
+        )
+        msg.html = body_html
+        mail.send(msg)
+        print(f"📧 Notification sent successfully to {recipient}")
+    except Exception as e:
+        print(f"⚠️ Email engine failed to deliver notification: {str(e)}")
 
 # Login Page
 @app.route("/", methods=["GET", "POST"])
@@ -348,6 +372,16 @@ def add():
                 email=f"{username_id}@nexus.tech"
             )
             db.session.add(new_automatic_user)
+            # 📧 Trigger the welcome email notification
+            email_body = f"""
+            <h3>Welcome to Nexus Technology Industries, {assigned_user_name}!</h3>
+            <p>An IT asset has been successfully assigned to you, and your profile has been provisioned.</p>
+            <p><b>Your Username:</b> {username_id}</p>
+            <p><b>Your Default Password:</b> welcome2026</p>
+            <br/>
+            <p><i>Please log into your portal dashboard to verify your profile and update your password under system settings immediately.</i></p>
+            """
+            send_system_email("🎉 Your New IT Portal Account Credentials", f"{username_id}@nexus.tech", email_body)
             flash(f"🎉 Auto-Provision: Account created for {assigned_user_name}. User: {username_id} | Pass: {default_password}")
 
     new_asset = AssetModel(
@@ -718,6 +752,17 @@ def tickets():
         db.session.add(new_ticket)
         add_transaction(asset_id, "Ticket Raised", f"Issue reported: {new_ticket.issue}")
         db.session.commit()
+        # 📧 If it's a critical issue, alert the Admin instantly!
+        if request.form.get("priority", "Medium") == "High":
+            admin_alert_body = f"""
+            <h3>🚨 Critical System Ticket Alert: {new_ticket.ticket_id}</h3>
+            <p><b>Asset Target ID:</b> {asset_id}</p>
+            <p><b>Issue Encountered:</b> {new_ticket.issue}</p>
+            <p><b>Reported By Profile:</b> {current_user.name}</p>
+            <br/>
+            <p>Please log into the management console to review and triage this system disruption immediately.</p>
+            """
+            send_system_email(f"⚠️ High Priority Ticket Notification: {new_ticket.ticket_id}", "admin@nexus.tech", admin_alert_body)
         return redirect("/tickets")
 
     search = request.args.get("search", "").strip()
