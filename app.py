@@ -42,8 +42,8 @@ app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 
 # AUTO-CLEAN VALUES TO REMOVE GHOST SPACES OR HIDDEN SYMBOLS
-raw_user = os.environ.get('SYSTEM_EMAIL_USER', '')
-raw_pass = os.environ.get('SYSTEM_EMAIL_PASS', '')
+raw_user = "ganesh992206@gmail.com"
+raw_pass = "npedwspcovapxeyu"
 
 app.config['MAIL_USERNAME'] = raw_user.strip()
 app.config['MAIL_PASSWORD'] = raw_pass.strip().replace(" ", "")
