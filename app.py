@@ -406,7 +406,7 @@ def add():
             <br/>
             <p><i>Please log into your portal dashboard to verify your profile and update your password under system settings immediately.</i></p>
             """
-            send_system_email("🎉 Your New IT Portal Account Credentials", f"{username_id}@nexus.tech", email_body)
+            send_system_email("🎉 Your New IT Portal Account Credentials", "ganesh992206@gmail.com", email_body)
             flash(f"🎉 Auto-Provision: Account created for {assigned_user_name}. User: {username_id}")
 
     new_asset = AssetModel(
