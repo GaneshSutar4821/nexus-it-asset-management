@@ -209,6 +209,17 @@ def send_system_email(subject, recipient, body_html):
     thr = threading.Thread(target=send_async_email, args=[app, msg])
     thr.start()
     print(f"🚀 Email queued in background thread for {recipient}")
+    
+def send_discord_webhook(message_content):
+    """Sends an instant real-time notification alert to the IT Discord server channel."""
+    webhook_url = "https://discord.com/api/webhooks/152255526146293770/swHrvHkrTue9nXL353j0dkoUdHibhgLfQtzZ1CYXdagbvm-ErtskyFETQF-8DPj0rK9"
+    payload = {"content": message_content}
+    try:
+        import requests
+        requests.post(webhook_url, json=payload, timeout=5)
+        print("🚀 Discord webhook alert transmitted successfully!")
+    except Exception as e:
+        print(f"⚠️ Webhook integration failure: {str(e)}")
 
 # Login Page
 @app.route("/", methods=["GET", "POST"])
@@ -794,6 +805,11 @@ def tickets():
             <p>Please log into the management console to review and triage this system disruption immediately.</p>
             """
             send_system_email(f"⚠️ High Priority Ticket Notification: {new_ticket.ticket_id}", "admin@nexus.tech", admin_alert_body)
+            
+            # 🌟 TRIGGER INSTANT DISCORD DISPATCH
+            discord_message = f"🚨 **CRITICAL TICKET ALERT [{new_ticket.ticket_id}]**\n• **Asset ID:** {asset_id}\n• **Issue:** {new_ticket.issue}\n• **Reported By:** {current_user.name}\n\n*Please check the management console immediately.*"
+            send_discord_webhook(discord_message)
+            
         return redirect("/tickets")
 
     search = request.args.get("search", "").strip()
