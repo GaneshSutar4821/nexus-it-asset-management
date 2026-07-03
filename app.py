@@ -372,15 +372,20 @@ def add():
     username_id = None
     
     if assigned_user_name and assigned_user_name not in ["-", "None", "STORE", "In Store"]:
-        # Generate standard username format based on their real name
-        username_id = assigned_user_name.lower().replace(" ", "_")
+        # 1. Generate base username structure (e.g., kiran_shinde)
+        base_username = assigned_user_name.lower().replace(" ", "_")
+        username_id = base_username
         
-        # Check if an account profile already exists for this person
+        # 2. 🌟 LOOKUP LOOP: Keep incrementing if this exact username is taken by another person
+        counter = 2
+        while db.session.get(UserModel, username_id):
+            username_id = f"{base_username}{counter}"
+            counter += 1
+        
+        # 3. Now that username_id is guaranteed completely unique, check and create the row
         user_exists = db.session.get(UserModel, username_id)
-        
-        # 🌟 Only create a brand new account profile if they don't exist yet
         if not user_exists:
-            default_password = "welcome2026"
+            default_password = "Nexus@2026"  # Updated to match your system default pattern
             
             new_automatic_user = UserModel(
                 username=username_id,
@@ -390,25 +395,26 @@ def add():
                 email=f"{username_id}@nexus.tech"
             )
             db.session.add(new_automatic_user)
+            db.session.flush()  # 🌟 Force SQL Alchemy to create the user immediately before linking the asset
             
-            # 📧 Trigger the welcome email notification securely in the background thread
+            # 📧 Trigger the welcome email notification targeting the unique email address
             email_body = f"""
             <h3>Welcome to Nexus Technology Industries, {assigned_user_name}!</h3>
             <p>An IT asset has been successfully assigned to you, and your profile has been provisioned.</p>
-            <p><b>Your Username:</b> {username_id}</p>
-            <p><b>Your Default Password:</b> welcome2026</p>
+            <p><b>Your Unique Username:</b> {username_id}</p>
+            <p><b>Your Default Password:</b> Nexus@2026</p>
             <br/>
-            <p><i>Please log into your portal dashboard to verify your profile and update your password immediately under settings.</i></p>
+            <p><i>Please log into your portal dashboard to verify your profile and update your password under system settings immediately.</i></p>
             """
             send_system_email("🎉 Your New IT Portal Account Credentials", f"{username_id}@nexus.tech", email_body)
-            flash(f"🎉 Auto-Provision: Account created for {assigned_user_name}.")
+            flash(f"🎉 Auto-Provision: Account created for {assigned_user_name}. User: {username_id}")
 
     new_asset = AssetModel(
         asset_id=asset_id,
         asset_type=request.form.get("Type", ""),
         brand=request.form.get("Brand", ""),
         model=request.form.get("Model", ""),
-        # Safely links to the existing username or fallbacks to the typed name string
+        # Assigns the safe, unique user id string to the asset record
         user=username_id if username_id else assigned_user_name,
         department=request.form.get("Department", ""),
         status=request.form.get("Status", "Active"),
