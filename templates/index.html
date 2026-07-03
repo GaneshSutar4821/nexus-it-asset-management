@@ -102,7 +102,8 @@
         }
 
         /* Forms, Inputs & Layout Components */
-        input, select {
+        input,
+        select {
             padding: 12px 14px;
             margin: 6px;
             background: var(--input-bg);
@@ -118,14 +119,16 @@
             color: #94a3b8;
         }
 
-        input:focus, select:focus {
+        input:focus,
+        select:focus {
             border-color: var(--accent-blue);
             outline: none;
             box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
         }
 
         /* Container Sections */
-        .section, .search-card {
+        .section,
+        .search-card {
             background: var(--panel-bg);
             padding: 24px;
             border-radius: 20px;
@@ -135,7 +138,8 @@
             transition: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .section:hover, .search-card:hover {
+        .section:hover,
+        .search-card:hover {
             transform: translateY(-2px);
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.06), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
         }
@@ -177,17 +181,44 @@
             color: var(--text-muted);
         }
 
-        .total-card { border-top: 4px solid #3b82f6; h2 { color: #2563eb; } }
-        .active-card { border-top: 4px solid #22c55e; h2 { color: #16a34a; } }
-        .inactive-card { border-top: 4px solid #ef4444; h2 { color: #dc2626; } }
-        .warranty-card { border-top: 4px solid #f59e0b; h2 { color: #d97706; } }
+        .total-card {
+            border-top: 4px solid #3b82f6;
+
+            h2 {
+                color: #2563eb;
+            }
+        }
+
+        .active-card {
+            border-top: 4px solid #22c55e;
+
+            h2 {
+                color: #16a34a;
+            }
+        }
+
+        .inactive-card {
+            border-top: 4px solid #ef4444;
+
+            h2 {
+                color: #dc2626;
+            }
+        }
+
+        .warranty-card {
+            border-top: 4px solid #f59e0b;
+
+            h2 {
+                color: #d97706;
+            }
+        }
 
         .asset-actions {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 25px;
             margin-top: 25px;
-            align-items: start; 
+            align-items: start;
         }
 
         .section h3 {
@@ -258,10 +289,32 @@
         }
 
         /* Dynamic Operations Formatting Buttons */
-        .btn-inline-load { background: #0284c7; padding: 6px 12px; font-size: 12px; border-radius: 6px; box-shadow: none; }
-        .btn-inline-load:hover { background: #0369a1; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.2); }
-        .btn-inline-delete { background: #ef4444; padding: 6px 12px; font-size: 12px; border-radius: 6px; margin-left: 6px; box-shadow: none; }
-        .btn-inline-delete:hover { background: #b91c1c; box-shadow: 0 4px 10px rgba(239, 68, 68, 0.2); }
+        .btn-inline-load {
+            background: #0284c7;
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 6px;
+            box-shadow: none;
+        }
+
+        .btn-inline-load:hover {
+            background: #0369a1;
+            box-shadow: 0 4px 10px rgba(2, 132, 199, 0.2);
+        }
+
+        .btn-inline-delete {
+            background: #ef4444;
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 6px;
+            margin-left: 6px;
+            box-shadow: none;
+        }
+
+        .btn-inline-delete:hover {
+            background: #b91c1c;
+            box-shadow: 0 4px 10px rgba(239, 68, 68, 0.2);
+        }
 
         .inline-pulse-badge {
             background: #fee2e2;
@@ -287,7 +340,9 @@
             letter-spacing: 0.5px;
         }
 
-        form input[type="text"], form select, form input[type="date"] {
+        form input[type="text"],
+        form select,
+        form input[type="date"] {
             width: calc(100% - 12px);
             margin: 6px;
         }
@@ -321,30 +376,67 @@
         }
 
         @media(max-width:1024px) {
-            .dashboard { grid-template-columns: repeat(2, 1fr); }
-        }
-        @media(max-width:640px) {
-            .dashboard { grid-template-columns: 1fr; }
-            .user-status-bar { flex-direction: column; gap: 12px; text-align: center; }
+            .dashboard {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
 
-        .view-assets { margin-bottom: 40px; }
+        @media(max-width:640px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .user-status-bar {
+                flex-direction: column;
+                gap: 12px;
+                text-align: center;
+            }
+        }
+
+        .view-assets {
+            margin-bottom: 40px;
+        }
 
         /* Animation Keyframes */
         @keyframes pageFadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-12px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(-12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         @keyframes indexPulse {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.2); }
-            70% { transform: scale(1.02); box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
-            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.2);
+            }
+
+            70% {
+                transform: scale(1.02);
+                box-shadow: 0 0 0 6px rgba(239, 68, 68, 0);
+            }
+
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+            }
         }
     </style>
 </head>
@@ -353,7 +445,9 @@
 
     <div class="user-status-bar">
         <div class="user-info">
-            <a href="/portal" style="text-decoration: none; font-weight: bold; color: var(--accent-blue); margin-right: 18px;">← Portal Home</a>
+            <a href="/portal"
+                style="text-decoration: none; font-weight: bold; color: var(--accent-blue); margin-right: 18px;">←
+                Portal Home</a>
             Welcome, <span>{{ current_user.name }}</span> (Role: <span>{{ current_user.role }}</span>)
 
             {% if current_user.role in ['Admin', 'Technician'] and alert_count > 0 %}
@@ -369,7 +463,8 @@
 
     <div class="quick-actions">
         {% if current_user.role in ['Admin', 'Technician'] and alert_count > 0 %}
-        <span style="color: #ef4444; font-size: 13px; font-weight: bold; animation: indexPulse 1.5s infinite; padding: 6px 12px; border-radius: 8px; background: #fee2e2; border: 1px solid #fca5a5; margin-right: auto;">
+        <span
+            style="color: #ef4444; font-size: 13px; font-weight: bold; animation: indexPulse 1.5s infinite; padding: 6px 12px; border-radius: 8px; background: #fee2e2; border: 1px solid #fca5a5; margin-right: auto;">
             🔴 Attention: Open Support Tickets Require Interaction!
         </span>
         {% endif %}
@@ -381,7 +476,8 @@
             <option value="/assign_asset">Asset Assignment</option>
             {% endif %}
 
-            <option value="/tickets">Ticket Management {% if current_user.role in ['Admin', 'Technician'] and alert_count > 0 %}({{ alert_count }} New){% endif %}</option>
+            <option value="/tickets">Ticket Management {% if current_user.role in ['Admin', 'Technician'] and
+                alert_count > 0 %}({{ alert_count }} New){% endif %}</option>
 
             {% if current_user.role in ['Admin', 'Technician'] %}
             <option value="/reports">Reports</option>
@@ -442,16 +538,22 @@
 
     <div class="section" style="margin-top: 20px;">
         <details>
-            <summary style="font-weight: bold; cursor: pointer; font-size: 16px; color: var(--accent-blue);">📊 Click to View Operational Analytics Charts</summary>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; align-items: start; margin-top: 15px;">
-                <div style="background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid var(--border-color);">
-                    <h4 style="text-align: center; margin-top: 0; color: var(--text-dark); font-weight: 600;">Operational Status Summary</h4>
+            <summary style="font-weight: bold; cursor: pointer; font-size: 16px; color: var(--accent-blue);">📊 Click to
+                View Operational Analytics Charts</summary>
+            <div
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; align-items: start; margin-top: 15px;">
+                <div
+                    style="background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid var(--border-color);">
+                    <h4 style="text-align: center; margin-top: 0; color: var(--text-dark); font-weight: 600;">
+                        Operational Status Summary</h4>
                     <div style="max-height: 220px; display: flex; justify-content: center;">
                         <canvas id="statusChart"></canvas>
                     </div>
                 </div>
-                <div style="background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid var(--border-color);">
-                    <h4 style="text-align: center; margin-top: 0; color: var(--text-dark); font-weight: 600;">Departmental Allocation Details</h4>
+                <div
+                    style="background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid var(--border-color);">
+                    <h4 style="text-align: center; margin-top: 0; color: var(--text-dark); font-weight: 600;">
+                        Departmental Allocation Details</h4>
                     <div style="max-height: 220px; display: flex; justify-content: center;">
                         <canvas id="deptChart"></canvas>
                     </div>
@@ -459,6 +561,46 @@
             </div>
         </details>
     </div>
+    {% if selected_asset and qr_base64 %}
+    <div class="section" style="border-left: 5px solid var(--accent-blue); background: var(--panel-bg);">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px;">
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <div
+                    style="background: white; padding: 8px; border: 1px solid var(--border-color); border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+                    <img src="data:image/png;base64,{{ qr_base64 }}" alt="Asset QR Code"
+                        style="display: block; width: 100px; height: 100px;">
+                </div>
+                <div>
+                    <h3 style="margin: 0 0 4px 0; color: var(--primary-blue);">Mobile Asset Passport</h3>
+                    <p style="margin: 0 0 8px 0; color: var(--text-muted); font-size: 14px;">
+                        Currently viewing passport profile matrix parameters for hardware tag: <strong>{{
+                            selected_asset['Assets Id'] }}</strong>
+                    </p>
+                    <span class="user-info" style="font-size: 13px;">
+                        Status Flag:
+                        {% if selected_asset['Status'] == 'Active' %}
+                        <span style="color: #16a34a;">{{ selected_asset['Status'] }}</span>
+                        {% else %}
+                        <span style="color: #dc2626;">{{ selected_asset['Status'] }}</span>
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <a href="/m/asset/{{ selected_asset['Assets Id'] }}" target="_blank" style="text-decoration: none;">
+                    <button type="button"
+                        style="background: linear-gradient(135deg, #475569, #334155); box-shadow: none;">🖥 Launch
+                        Mobile View</button>
+                </a>
+                <a href="/download_sticker/{{ selected_asset['Assets Id'] }}" style="text-decoration: none;">
+                    <button type="button"
+                        style="background: linear-gradient(135deg, #16a34a, #15803d); box-shadow: none;">📥 Download
+                        Print Label (PDF)</button>
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 
     <div class="search-card">
         <form method="GET" action="/assets">
@@ -533,7 +675,8 @@
                     <input type="text" name="Supplier_Invoice_No" placeholder="Supplier Invoice No.">
 
                     <label>Supplier Invoice Date:</label>
-                    <input type="date" id="add_Supplier_Invoice_Date" name="Supplier_Invoice_Date" onchange="calculateAddWarrantyExpiry()">
+                    <input type="date" id="add_Supplier_Invoice_Date" name="Supplier_Invoice_Date"
+                        onchange="calculateAddWarrantyExpiry()">
 
                     <label>Serial No:</label>
                     <input type="text" name="Serial No" placeholder="Serial No">
@@ -542,7 +685,8 @@
                     <input type="text" name="TAG Id" placeholder="TAG Id">
 
                     <label>Warranty Period:</label>
-                    <select id="add_warranty_period" name="Warranty Period" required onchange="calculateAddWarrantyExpiry()">
+                    <select id="add_warranty_period" name="Warranty Period" required
+                        onchange="calculateAddWarrantyExpiry()">
                         <option value="">Select Warranty</option>
                         <option value="1 Years">1 Year</option>
                         <option value="2 Years">2 Years</option>
@@ -563,14 +707,17 @@
             <h3>Delete Asset</h3>
             <button class="section-btn" onclick="toggleDelete()">Delete Asset</button>
             <div id="deleteForm" style="display:none; margin-top: 15px;">
-                <form method="POST" action="/delete" onsubmit="return confirm('Warning: This will permanently delete this asset registry data. Proceed?');">
-                    <input list="asset_ids" id="delete_asset_id" name="asset_id" placeholder="Select or Enter Asset ID" required>
+                <form method="POST" action="/delete"
+                    onsubmit="return confirm('Warning: This will permanently delete this asset registry data. Proceed?');">
+                    <input list="asset_ids" id="delete_asset_id" name="asset_id" placeholder="Select or Enter Asset ID"
+                        required>
                     <datalist id="asset_ids">
                         {% for asset in assets %}
                         <option value="{{ asset['Assets Id'] }}">
-                        {% endfor %}
+                            {% endfor %}
                     </datalist>
-                    <button type="submit" style="background: linear-gradient(135deg, #ef4444, #b91c1c);">Delete Asset</button>
+                    <button type="submit" style="background: linear-gradient(135deg, #ef4444, #b91c1c);">Delete
+                        Asset</button>
                 </form>
             </div>
         </div>
@@ -582,41 +729,54 @@
             <div id="updateForm" style="display:none; margin-top: 15px;">
                 <form method="POST" action="/update">
                     {% if qr_base64 %}
-                    <div style="background: #f8fafc; border: 2px dashed var(--border-color); padding: 18px; border-radius: 14px; display: flex; align-items: center; gap: 18px; margin-bottom: 22px; box-shadow: inset 0 2px 8px rgba(0,0,0,0.02);">
-                        <div style="flex-shrink: 0; background: white; padding: 6px; border: 1px solid var(--border-color); border-radius: 8px;">
-                            <img src="data:image/png;base64,{{ qr_base64 }}" alt="Asset QR Code Sticker" style="border-radius: 4px; display: block;">
+                    <div
+                        style="background: #f8fafc; border: 2px dashed var(--border-color); padding: 18px; border-radius: 14px; display: flex; align-items: center; gap: 18px; margin-bottom: 22px; box-shadow: inset 0 2px 8px rgba(0,0,0,0.02);">
+                        <div
+                            style="flex-shrink: 0; background: white; padding: 6px; border: 1px solid var(--border-color); border-radius: 8px;">
+                            <img src="data:image/png;base64,{{ qr_base64 }}" alt="Asset QR Code Sticker"
+                                style="border-radius: 4px; display: block;">
                         </div>
                         <div style="text-align: left;">
-                            <h4 style="margin: 0 0 6px 0; color: var(--text-dark); font-size: 15px; font-weight: 600;">📦 Official Asset Inventory Sticker</h4>
-                            <p style="margin: 0 0 12px 0; font-size: 13px; color: var(--text-muted); line-height: 1.45;">
+                            <h4 style="margin: 0 0 6px 0; color: var(--text-dark); font-size: 15px; font-weight: 600;">
+                                📦 Official Asset Inventory Sticker</h4>
+                            <p
+                                style="margin: 0 0 12px 0; font-size: 13px; color: var(--text-muted); line-height: 1.45;">
                                 <b>ID:</b> {{ selected_asset['Assets Id'] }}<br>
-                                Print and attach this tag directly to physical hardware for instant scanning and logging.
+                                Print and attach this tag directly to physical hardware for instant scanning and
+                                logging.
                             </p>
-                            
-                            <a href="/download_sticker/{{ selected_asset['Assets Id'] }}" 
-                               style="display: inline-block; background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue)); color: white; text-decoration: none; padding: 8px 16px; font-size: 12px; font-weight: 600; border-radius: 8px; transition: all 0.2s;"
-                               onmouseover="this.style.filter='brightness(1.1)'" 
-                               onmouseout="this.style.filter='none'">
+
+                            <a href="/download_sticker/{{ selected_asset['Assets Id'] }}"
+                                style="display: inline-block; background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue)); color: white; text-decoration: none; padding: 8px 16px; font-size: 12px; font-weight: 600; border-radius: 8px; transition: all 0.2s;"
+                                onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter='none'">
                                 ⬇ Download Print Tag (PDF)
                             </a>
                         </div>
                     </div>
                     {% endif %}
-                    
-                    <input list="asset_ids" id="update_asset_id" name="asset_id" value="{{selected_asset['Assets Id'] if selected_asset else ''}}" placeholder="Select or Enter Asset ID" required>
-                    <button type="submit" formaction="/load_asset" style="width: calc(100% - 12px); margin: 6px;">Load Asset</button>
+
+                    <input list="asset_ids" id="update_asset_id" name="asset_id"
+                        value="{{selected_asset['Assets Id'] if selected_asset else ''}}"
+                        placeholder="Select or Enter Asset ID" required>
+                    <button type="submit" formaction="/load_asset" style="width: calc(100% - 12px); margin: 6px;">Load
+                        Asset</button>
                     <datalist id="asset_ids">
                         {% for asset in assets %}
                         <option value="{{ asset['Assets Id'] }}">
-                        {% endfor %}
+                            {% endfor %}
                     </datalist>
 
-                    <input list="type_list" name="Type" value="{{selected_asset['Type'] if selected_asset else ''}}" placeholder="Type">
-                    <input type="text" name="Brand" value="{{ selected_asset['Brand'] if selected_asset else ''}}" placeholder="Brand">
-                    <input type="text" name="Model" value="{{ selected_asset['Model'] if selected_asset else ''}}" placeholder="Model">
-                    <input type="text" name="User" value="{{ selected_asset['User'] if selected_asset else ''}}" placeholder="User">
+                    <input list="type_list" name="Type" value="{{selected_asset['Type'] if selected_asset else ''}}"
+                        placeholder="Type">
+                    <input type="text" name="Brand" value="{{ selected_asset['Brand'] if selected_asset else ''}}"
+                        placeholder="Brand">
+                    <input type="text" name="Model" value="{{ selected_asset['Model'] if selected_asset else ''}}"
+                        placeholder="Model">
+                    <input type="text" name="User" value="{{ selected_asset['User'] if selected_asset else ''}}"
+                        placeholder="User">
 
-                    <input list="departments" name="Department" value="{{ selected_asset['Department'] if selected_asset else ''}}" placeholder="Department">
+                    <input list="departments" name="Department"
+                        value="{{ selected_asset['Department'] if selected_asset else ''}}" placeholder="Department">
                     <datalist id="departments">
                         <option value="IT">
                         <option value="HR">
@@ -625,7 +785,8 @@
                         <option value="Admin">
                     </datalist>
 
-                    <input list="status_list" name="Status" value="{{ selected_asset['Status'] if selected_asset else ''}}" placeholder="Status">
+                    <input list="status_list" name="Status"
+                        value="{{ selected_asset['Status'] if selected_asset else ''}}" placeholder="Status">
                     <datalist id="status_list">
                         <option value="Active">
                         <option value="Inactive">
@@ -633,35 +794,51 @@
                     </datalist>
 
                     <label>GRN No.:</label>
-                    <input type="text" name="GRN_No" value="{{ selected_asset['GRN No.'] if selected_asset else ''}}" placeholder="GRN No.">
+                    <input type="text" name="GRN_No" value="{{ selected_asset['GRN No.'] if selected_asset else ''}}"
+                        placeholder="GRN No.">
 
                     <label>GRN Date:</label>
-                    <input type="date" name="GRN_Date" value="{{ selected_asset['GRN Date'] if selected_asset else ''}}">
+                    <input type="date" name="GRN_Date"
+                        value="{{ selected_asset['GRN Date'] if selected_asset else ''}}">
 
-                    <input type="text" name="Supplier_Name" value="{{ selected_asset['Supplier Name'] if selected_asset else ''}}" placeholder="Supplier Name">
-                    <input type="text" name="Supplier_Invoice_No" value="{{ selected_asset['Supplier Invoice No.'] if selected_asset else ''}}" placeholder="Supplier Invoice No.">
+                    <input type="text" name="Supplier_Name"
+                        value="{{ selected_asset['Supplier Name'] if selected_asset else ''}}"
+                        placeholder="Supplier Name">
+                    <input type="text" name="Supplier_Invoice_No"
+                        value="{{ selected_asset['Supplier Invoice No.'] if selected_asset else ''}}"
+                        placeholder="Supplier Invoice No.">
 
                     <label>Supplier Invoice Date:</label>
-                    <input type="date" id="Supplier_Invoice_Date" name="Supplier_Invoice_Date" value="{{ selected_asset['Supplier Invoice Date'] if selected_asset else '' }}" onchange="calculateUpdateWarrantyExpiry()">
+                    <input type="date" id="Supplier_Invoice_Date" name="Supplier_Invoice_Date"
+                        value="{{ selected_asset['Supplier Invoice Date'] if selected_asset else '' }}"
+                        onchange="calculateUpdateWarrantyExpiry()">
 
                     <label>Serial No:</label>
-                    <input type="text" name="Serial No" value="{{ selected_asset['Serial No'] if selected_asset else '' }}" placeholder="Serial No">
+                    <input type="text" name="Serial No"
+                        value="{{ selected_asset['Serial No'] if selected_asset else '' }}" placeholder="Serial No">
 
                     <label>TAG Id:</label>
-                    <input type="text" name="TAG Id" value="{{ selected_asset['TAG Id'] if selected_asset else '' }}" placeholder="TAG Id">
+                    <input type="text" name="TAG Id" value="{{ selected_asset['TAG Id'] if selected_asset else '' }}"
+                        placeholder="TAG Id">
 
                     <label>Warranty Period:</label>
                     <select id="Warranty_Period" name="Warranty Period" onchange="calculateUpdateWarrantyExpiry()">
                         <option value="">Select Warranty</option>
-                        <option value="1 Years" {% if selected_asset and "1" in selected_asset["Warranty Period"]|string %}selected{% endif %}>1 Year</option>
-                        <option value="2 Years" {% if selected_asset and "2" in selected_asset["Warranty Period"]|string %}selected{% endif %}>2 Years</option>
-                        <option value="3 Years" {% if selected_asset and "3" in selected_asset["Warranty Period"]|string %}selected{% endif %}>3 Years</option>
-                        <option value="4 Years" {% if selected_asset and "4" in selected_asset["Warranty Period"]|string %}selected{% endif %}>4 Years</option>
-                        <option value="5 Years" {% if selected_asset and "5" in selected_asset["Warranty Period"]|string %}selected{% endif %}>5 Years</option>
+                        <option value="1 Years" {% if selected_asset and "1" in selected_asset["Warranty Period"]|string
+                            %}selected{% endif %}>1 Year</option>
+                        <option value="2 Years" {% if selected_asset and "2" in selected_asset["Warranty Period"]|string
+                            %}selected{% endif %}>2 Years</option>
+                        <option value="3 Years" {% if selected_asset and "3" in selected_asset["Warranty Period"]|string
+                            %}selected{% endif %}>3 Years</option>
+                        <option value="4 Years" {% if selected_asset and "4" in selected_asset["Warranty Period"]|string
+                            %}selected{% endif %}>4 Years</option>
+                        <option value="5 Years" {% if selected_asset and "5" in selected_asset["Warranty Period"]|string
+                            %}selected{% endif %}>5 Years</option>
                     </select>
 
                     <label>Warranty Expiry:</label>
-                    <input type="date" id="Warranty_Expiry" name="Warranty Expiry" value="{{ selected_asset['Warranty Expiry'] if selected_asset else '' }}">
+                    <input type="date" id="Warranty_Expiry" name="Warranty Expiry"
+                        value="{{ selected_asset['Warranty Expiry'] if selected_asset else '' }}">
 
                     <button type="submit">Update Asset</button>
                 </form>
@@ -673,7 +850,9 @@
     <br>
     <div class="view-assets">
         <details>
-            <summary style="font-weight: bold; cursor: pointer; font-size: 16px; margin-bottom: 15px; color: var(--accent-blue);">Click to View Assets</summary>
+            <summary
+                style="font-weight: bold; cursor: pointer; font-size: 16px; margin-bottom: 15px; color: var(--accent-blue);">
+                Click to View Assets</summary>
             <div class="table-responsive-wrapper">
                 <table>
                     <tr>
@@ -724,7 +903,8 @@
                                 </form>
 
                                 {% if current_user.role == 'Admin' %}
-                                <form method="POST" action="/delete" style="display:inline;" onsubmit="return confirm('Warning: This will permanently delete this asset registry data. Proceed?');">
+                                <form method="POST" action="/delete" style="display:inline;"
+                                    onsubmit="return confirm('Warning: This will permanently delete this asset registry data. Proceed?');">
                                     <input type="hidden" name="asset_id" value="{{ asset['Assets Id'] }}">
                                     <button type="submit" class="btn-inline-delete">Delete</button>
                                 </form>
