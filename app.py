@@ -372,18 +372,13 @@ def add():
     username_id = None
     
     if assigned_user_name and assigned_user_name not in ["-", "None", "STORE", "In Store"]:
-        # 1. Generate base username structure
-        base_username = assigned_user_name.lower().replace(" ", "_")
-        username_id = base_username
+        # Generate standard username format based on their real name
+        username_id = assigned_user_name.lower().replace(" ", "_")
         
-        # 2. 🌟 NEW COLLISION-PROOF LOOP: Append incrementing numbers if username is taken
-        counter = 2
-        while db.session.get(UserModel, username_id):
-            username_id = f"{base_username}{counter}"
-            counter += 1
-        
-        # 3. Safe to provision profile now that username_id is guaranteed unique
+        # Check if an account profile already exists for this person
         user_exists = db.session.get(UserModel, username_id)
+        
+        # 🌟 Only create a brand new account profile if they don't exist yet
         if not user_exists:
             default_password = "welcome2026"
             
@@ -396,24 +391,24 @@ def add():
             )
             db.session.add(new_automatic_user)
             
-            # 📧 Trigger the welcome email notification targeting the unique email address
+            # 📧 Trigger the welcome email notification securely in the background thread
             email_body = f"""
             <h3>Welcome to Nexus Technology Industries, {assigned_user_name}!</h3>
             <p>An IT asset has been successfully assigned to you, and your profile has been provisioned.</p>
-            <p><b>Your Unique Username:</b> {username_id}</p>
+            <p><b>Your Username:</b> {username_id}</p>
             <p><b>Your Default Password:</b> welcome2026</p>
             <br/>
-            <p><i>Please log into your portal dashboard to verify your profile and update your password under system settings immediately.</i></p>
+            <p><i>Please log into your portal dashboard to verify your profile and update your password immediately under settings.</i></p>
             """
             send_system_email("🎉 Your New IT Portal Account Credentials", f"{username_id}@nexus.tech", email_body)
-            flash(f"🎉 Auto-Provision: Account created for {assigned_user_name}. User: {username_id} | Pass: {default_password}")
+            flash(f"🎉 Auto-Provision: Account created for {assigned_user_name}.")
 
     new_asset = AssetModel(
         asset_id=asset_id,
         asset_type=request.form.get("Type", ""),
         brand=request.form.get("Brand", ""),
         model=request.form.get("Model", ""),
-        # Assign the unique generated username string to the asset record
+        # Safely links to the existing username or fallbacks to the typed name string
         user=username_id if username_id else assigned_user_name,
         department=request.form.get("Department", ""),
         status=request.form.get("Status", "Active"),
