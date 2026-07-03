@@ -5,6 +5,7 @@ import os
 from io import BytesIO
 from functools import wraps
 import shutil
+import threading
 
 from flask import Flask, render_template, request, redirect, send_file, url_for, abort, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
@@ -179,18 +180,30 @@ def log_audit(action, asset_id):
     db.session.add(new_log)
     db.session.commit()
     
+from flask import current_app
+
+def send_async_email(app, msg):
+    with app.app_context():
+        try:
+            mail.send(msg)
+            print(f"📧 Background notification sent successfully to {msg.recipients}")
+        except Exception as e:
+            print(f"⚠️ Email engine background failure: {str(e)}")
+
 def send_system_email(subject, recipient, body_html):
-    """Safely queues and triggers a system notification email."""
-    try:
-        msg = Message(
-            subject=subject,
-            recipients=[recipient]
-        )
-        msg.html = body_html
-        mail.send(msg)
-        print(f"📧 Notification sent successfully to {recipient}")
-    except Exception as e:
-        print(f"⚠️ Email engine failed to deliver notification: {str(e)}")
+    """Queues and triggers a system notification email in a background thread."""
+    app = current_app._get_current_object()
+    
+    msg = Message(
+        subject=subject,
+        recipients=[recipient]
+    )
+    msg.html = body_html
+    
+    # Start the email processing on a separate parallel thread
+    thr = threading.Thread(target=send_async_email, args=[app, msg])
+    thr.start()
+    print(f"🚀 Email queued in background thread for {recipient}")
 
 # Login Page
 @app.route("/", methods=["GET", "POST"])
