@@ -42,8 +42,8 @@ app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 
 # AUTO-CLEAN VALUES TO REMOVE GHOST SPACES OR HIDDEN SYMBOLS
-raw_user = "ganesh992206@gmail.com"
-raw_pass = "npedwspcovapxeyu"
+raw_user = os.environ.get('SYSTEM_EMAIL_USER', '')
+raw_pass = os.environ.get('SYSTEM_EMAIL_PASS', '')
 
 app.config['MAIL_USERNAME'] = raw_user.strip()
 app.config['MAIL_PASSWORD'] = raw_pass.strip().replace(" ", "")
@@ -411,7 +411,7 @@ def add():
             <br/>
             <p><i>Please log into your portal dashboard to verify your profile and update your password under system settings immediately.</i></p>
             """
-            send_system_email("🎉 Your New IT Portal Account Credentials", "ganesh992206@gmail.com", email_body)
+            send_system_email("🎉 Your New IT Portal Account Credentials", f"{username_id}@nexus.tech", email_body)
             flash(f"🎉 Auto-Provision: Account created for {assigned_user_name}. User: {username_id}")
 
     new_asset = AssetModel(
