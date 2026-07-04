@@ -11,6 +11,7 @@ from flask import Flask, render_template, request, redirect, send_file, url_for,
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import check_password_hash, generate_password_hash
+import google.generativeai as genai
 
 from sqlalchemy import or_  # Imported safely for advanced database filtering
 
@@ -41,9 +42,13 @@ app.config['MAIL_PORT'] = 465
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 
+# --- AI TRIAGE ENGINE CONFIGURATION ---
+gemini_api_key = os.environ.get('GEMINI_API_KEY')
+genai.configure(api_key=gemini_api_key)
+
 # AUTO-CLEAN VALUES TO REMOVE GHOST SPACES OR HIDDEN SYMBOLS
-raw_user = os.environ.get('SYSTEM_EMAIL_USER', 'ganesh992206@gmail.com')
-raw_pass = os.environ.get('SYSTEM_EMAIL_PASS', 'rzmxpepppxqohbmv')
+raw_user = os.environ.get('SYSTEM_EMAIL_USER', '')
+raw_pass = os.environ.get('SYSTEM_EMAIL_PASS', '')
 
 app.config['MAIL_USERNAME'] = raw_user.strip()
 app.config['MAIL_PASSWORD'] = raw_pass.strip().replace(" ", "")
@@ -209,6 +214,27 @@ def send_system_email(subject, recipient, body_html):
     thr = threading.Thread(target=send_async_email, args=[app, msg])
     thr.start()
     print(f"🚀 Email queued in background thread for {recipient}")
+
+def ai_analyze_ticket(issue_summary, fault_description):
+    """Sends the ticket text to the AI to get a categorized assessment."""
+    try:
+        model = genai.GenerativeModel('gemini-2.5-flash')
+        prompt = f"""
+        You are an expert IT Support Assistant. Review this incoming support ticket:
+        Issue: {issue_summary}
+        Description: {fault_description}
+        
+        Please provide:
+        1. The likely Category (Hardware, Software, Network, or Database).
+        2. One short, immediate troubleshooting step the admin should take.
+        Keep the response brief and professional.
+        """
+        
+        response = model.generate_content(prompt)
+        return response.text
+    except Exception as e:
+        print(f"AI Engine offline: {e}")
+        return "AI Triage currently unavailable."
     
 def send_discord_webhook(message_content):
     """Sends an instant real-time notification alert to the IT Discord server channel."""
@@ -810,6 +836,10 @@ def tickets():
             discord_message = f"🚨 **CRITICAL TICKET ALERT [{new_ticket.ticket_id}]**\n• **Asset ID:** {asset_id}\n• **Issue:** {new_ticket.issue}\n• **Reported By:** {current_user.name}\n\n*Please check the management console immediately.*"
             send_discord_webhook(discord_message)
             
+            # --- TEMPORARY AI TEST LINE ---
+            ai_test_result = ai_analyze_ticket(request.form.get('issue'), request.form.get('description'))
+            print(f"\n🤖 LIVE AI TRIAGE REPORT:\n{ai_test_result}\n")
+
         return redirect("/tickets")
 
     search = request.args.get("search", "").strip()
