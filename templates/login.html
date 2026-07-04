@@ -9,9 +9,10 @@
             --primary: #2563eb;
             --primary-glow: #3b82f6;
             --text-main: #ffffff;
-            --glass-bg: rgba(15, 23, 42, 0.65);
+            --glass-bg: rgba(15, 23, 42, 0.55);
             --glass-border: rgba(255, 255, 255, 0.08);
-            --input-bg: rgba(255, 255, 255, 0.05);
+            --input-bg: rgba(255, 255, 255, 0.03);
+            --transition-smooth: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         body {
@@ -21,14 +22,14 @@
             height: 100vh;
             overflow: hidden;
             background: 
-                radial-gradient(circle at 15% 15%, rgba(37, 99, 235, 0.25), transparent 35%),
-                radial-gradient(circle at 85% 85%, rgba(29, 78, 216, 0.2), transparent 35%),
+                radial-gradient(circle at 15% 15%, rgba(37, 99, 235, 0.15), transparent 35%),
+                radial-gradient(circle at 85% 85%, rgba(29, 78, 216, 0.1), transparent 35%),
                 linear-gradient(135deg, #020617, #070a13, #0f172a);
             display: flex;
             justify-content: center;
             align-items: center;
             position: relative;
-            perspective: 1000px;
+            perspective: 1200px;
         }
         
         /* Interactive Background Grid Network */
@@ -41,8 +42,22 @@
                 linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
             background-size: 60px 60px;
-            animation: moveGrid 24s linear infinite;
+            animation: moveGrid 30s linear infinite;
             z-index: 1;
+        }
+
+        /* Mouse Tracking Ambient Glow */
+        .cursor-glow {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+            transition: transform 0.1s ease-out;
+            opacity: 0;
         }
 
         .login-container {
@@ -53,32 +68,38 @@
             z-index: 5;
         }
 
-        /* High-End Glassmorphism Card Wrapper Layout */
+        /* High-End Glassmorphism Card */
         .login-box {
             width: 440px;
             padding: 50px 45px;
             background: var(--glass-bg);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
+            backdrop-filter: blur(28px);
+            -webkit-backdrop-filter: blur(28px);
             border: 1px solid var(--glass-border);
-            border-radius: 28px;
+            border-radius: 24px;
             box-shadow: 
-                0 4px 30px rgba(0, 0, 0, 0.2),
-                0 20px 50px rgba(0, 0, 0, 0.4),
-                inset 0 1px 1px rgba(255, 255, 255, 0.1);
+                0 4px 30px rgba(0, 0, 0, 0.3),
+                0 20px 50px rgba(0, 0, 0, 0.5),
+                inset 0 1px 1px rgba(255, 255, 255, 0.15);
             text-align: center;
             box-sizing: border-box;
-            animation: boxIn 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.5s;
+            animation: cardEntrance 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            transform-style: preserve-3d;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
-        .login-box:hover {
-            transform: translateY(-6px) rotateX(2deg) rotateY(-2deg);
-            box-shadow: 
-                0 10px 40px rgba(37, 99, 235, 0.15),
-                0 30px 70px rgba(0, 0, 0, 0.5),
-                inset 0 1px 2px rgba(255, 255, 255, 0.15);
+        /* Staggered Child Animations */
+        .animate-item {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: itemFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
+        .delay-1 { animation-delay: 0.2s; }
+        .delay-2 { animation-delay: 0.3s; }
+        .delay-3 { animation-delay: 0.4s; }
+        .delay-4 { animation-delay: 0.5s; }
+        .delay-5 { animation-delay: 0.6s; }
+        .delay-6 { animation-delay: 0.7s; }
 
         .logo-wrapper {
             position: relative;
@@ -88,60 +109,80 @@
 
         .logo {
             font-size: 56px;
-            filter: drop-shadow(0 0 16px rgba(37, 99, 235, 0.6));
-            animation: subtleGlow 3s ease-in-out infinite alternate;
+            filter: drop-shadow(0 0 20px rgba(37, 99, 235, 0.5));
+            animation: float 4s ease-in-out infinite alternate;
         }
 
         .company-name {
             color: var(--text-main);
-            font-size: 23px;
+            font-size: 24px;
             font-weight: 700;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             letter-spacing: 0.5px;
             line-height: 1.3;
         }
 
         .title {
             color: #94a3b8;
-            font-size: 14px;
-            font-weight: 500;
+            font-size: 13px;
+            font-weight: 600;
             margin-bottom: 35px;
-            letter-spacing: 0.75px;
+            letter-spacing: 1.5px;
             text-transform: uppercase;
         }
 
+        /* Modern Floating Label Inputs */
         .input-group {
             position: relative;
-            margin-bottom: 18px;
+            margin-bottom: 24px;
             text-align: left;
         }
 
         input {
             width: 100%;
-            padding: 14px 16px;
+            padding: 16px 16px 16px 16px;
             background: var(--input-bg);
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
             box-sizing: border-box;
-            font-size: 14px;
+            font-size: 15px;
             color: #f8fafc;
-            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+            transition: var(--transition-smooth);
         }
 
-        input::placeholder {
+        .input-group label {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
             color: #64748b;
+            font-size: 15px;
+            pointer-events: none;
+            transition: var(--transition-smooth);
         }
 
         input:hover {
-            border-color: rgba(255, 255, 255, 0.25);
-            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.06);
         }
 
         input:focus {
-            border-color: var(--primary);
+            border-color: var(--primary-glow);
             background: rgba(15, 23, 42, 0.6);
             outline: none;
-            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.18);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+        }
+
+        /* Float the label up when focused or has text */
+        input:focus ~ label,
+        input:not(:placeholder-shown) ~ label {
+            top: -10px;
+            left: 10px;
+            font-size: 12px;
+            color: var(--primary-glow);
+            background: #0b1120;
+            padding: 0 8px;
+            border-radius: 4px;
         }
 
         .password-container {
@@ -159,22 +200,23 @@
             top: 50%;
             transform: translateY(-50%);
             cursor: pointer;
-            font-size: 16px;
+            font-size: 18px;
             color: #64748b;
             user-select: none;
             transition: color 0.2s;
         }
 
         .toggle-password:hover {
-            color: #94a3b8;
+            color: #e2e8f0;
         }
 
+        /* Animated Shimmer Button */
         button {
             width: 100%;
-            padding: 14px;
+            padding: 15px;
             background: linear-gradient(135deg, var(--primary), #1d4ed8);
             color: white;
-            border: none;
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
             font-size: 15px;
             font-weight: 600;
@@ -182,138 +224,168 @@
             cursor: pointer;
             position: relative;
             overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+            transition: var(--transition-smooth);
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+        }
+
+        /* Button Sweep Effect */
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transform: skewX(-20deg);
+            transition: 0.5s;
         }
 
         button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
-            background: linear-gradient(135deg, #3b82f6, var(--primary));
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.5);
+        }
+
+        button:hover::before {
+            left: 150%;
+            transition: 0.7s ease-in-out;
         }
 
         button:active {
-            transform: translateY(0);
+            transform: translateY(1px);
         }
 
         .error-card {
-            color: #f87171;
-            background: rgba(239, 68, 68, 0.08);
+            color: #fca5a5;
+            background: rgba(220, 38, 38, 0.1);
             padding: 12px 14px;
-            border-radius: 12px;
+            border-radius: 10px;
             font-size: 13.5px;
             margin-bottom: 22px;
-            border: 1px solid rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(220, 38, 38, 0.25);
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            animation: shake 0.4s ease-in-out;
+            animation: itemFadeIn 0.4s ease forwards, shake 0.5s ease-in-out;
         }
 
         .footer {
             margin-top: 35px;
             color: #475569;
-            font-size: 11.5px;
+            font-size: 12px;
             font-weight: 500;
             letter-spacing: 0.5px;
             text-transform: uppercase;
         }
 
-        /* Fluid Aesthetic Mesh Emitters */
+        /* Fluid Emitters */
         .orb {
             position: absolute;
             border-radius: 50%;
-            filter: blur(40px);
+            filter: blur(50px);
             mix-blend-mode: screen;
-            opacity: 0.45;
-            animation: orbit 12s ease-in-out infinite alternate;
+            opacity: 0.4;
+            animation: orbit 15s ease-in-out infinite alternate;
             z-index: 2;
         }
 
         .orb-1 {
-            width: 280px;
-            height: 280px;
+            width: 300px;
+            height: 300px;
             background: rgba(37, 99, 235, 0.3);
-            top: -40px;
-            left: -40px;
+            top: -50px;
+            left: -50px;
         }
 
         .orb-2 {
-            width: 320px;
-            height: 320px;
+            width: 350px;
+            height: 350px;
             background: rgba(29, 78, 216, 0.25);
-            bottom: -60px;
-            right: -60px;
-            animation-delay: -4s;
+            bottom: -80px;
+            right: -80px;
+            animation-delay: -5s;
         }
 
-        /* Cinematic Animation Keyframes */
+        /* --- Keyframes --- */
         @keyframes moveGrid {
             0% { transform: translate(0, 0); }
             100% { transform: translate(-60px, -60px); }
         }   
 
-        @keyframes boxIn {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes cardEntrance {
+            0% { opacity: 0; transform: translateY(40px) scale(0.95); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
         }
 
-        @keyframes subtleGlow {
-            from { filter: drop-shadow(0 0 12px rgba(37, 99, 235, 0.4)); }
-            to { filter: drop-shadow(0 0 24px rgba(59, 130, 246, 0.7)); }
+        @keyframes itemFadeIn {
+            0% { opacity: 0; transform: translateY(15px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); filter: drop-shadow(0 0 15px rgba(37, 99, 235, 0.4)); }
+            100% { transform: translateY(-10px); filter: drop-shadow(0 0 25px rgba(59, 130, 246, 0.8)); }
         }
 
         @keyframes orbit {
             0% { transform: translate(0, 0) scale(1); }
-            50% { transform: translate(20px, -20px) scale(1.05); }
-            100% { transform: translate(-10px, 15px) scale(0.95); }
+            50% { transform: translate(30px, -30px) scale(1.1); }
+            100% { transform: translate(-15px, 20px) scale(0.9); }
         }
 
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-4px); }
-            40%, 80% { transform: translateX(4px); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
         }
     </style>
 </head>
 <body>
 
+<div class="cursor-glow" id="cursorGlow"></div>
 <div class="orb orb-1"></div>
 <div class="orb orb-2"></div>
 
 <div class="login-container">
-    <div class="login-box">
-        <div class="logo-wrapper">
+    <div class="login-box" id="loginCard">
+        <div class="logo-wrapper animate-item delay-1">
             <div class="logo">🖥️</div>
         </div>
-        <div class="company-name">Nexus Technology Industries Limited</div>
-        <div class="title">IT Asset Management System</div>
+        <div class="company-name animate-item delay-2">Nexus Technology Industries Limited</div>
+        <div class="title animate-item delay-3">IT Asset Management System</div>
         
         {% if error %}
-            <div class="error-card">
+            <div class="error-card animate-item delay-3">
                 <span>⚠️</span> {{ error }}
             </div>
         {% endif %}
 
         <form method="POST" action="">
-            <div class="input-group">
-                <input type="text" name="username" placeholder="Username" autocomplete="username" required>
+            <div class="input-group animate-item delay-4">
+                <input type="text" id="username" name="username" placeholder=" " autocomplete="username" required>
+                <label for="username">Username</label>
             </div>
-            <div class="input-group">
+            
+            <div class="input-group animate-item delay-5">
                 <div class="password-container">
-                    <input type="password" id="password" name="password" placeholder="Password" autocomplete="current-password" required>
+                    <input type="password" id="password" name="password" placeholder=" " autocomplete="current-password" required>
+                    <label for="password">Password</label>
                     <span id="toggle-icon" class="toggle-password" onclick="togglePassword()">👁️</span>
                 </div>
             </div>
-            <button type="submit" style="margin-top: 12px;">Sign In</button>
+            
+            <div class="animate-item delay-6">
+                <button type="submit">Sign In</button>
+            </div>
         </form>
 
-        <div class="footer">Asset Tracking & Management Portal</div>
+        <div class="footer animate-item delay-6">Asset Tracking & Management Portal</div>
     </div>
 </div>
 
 <script>
+// Password Toggle Functionality
 function togglePassword() {
     const passwordField = document.getElementById("password");
     const toggleIcon = document.getElementById("toggle-icon");
@@ -325,6 +397,30 @@ function togglePassword() {
         toggleIcon.innerText = "👁️";
     }
 }
+
+// 3D Card Tilt Effect
+const loginCard = document.getElementById('loginCard');
+document.addEventListener('mousemove', (e) => {
+    const xAxis = (window.innerWidth / 2 - e.pageX) / 40;
+    const yAxis = (window.innerHeight / 2 - e.pageY) / 40;
+    loginCard.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+});
+
+// Reset Card on Mouse Leave
+document.addEventListener('mouseleave', () => {
+    loginCard.style.transform = `rotateY(0deg) rotateX(0deg)`;
+});
+
+// Ambient Cursor Glow Follower
+const cursorGlow = document.getElementById('cursorGlow');
+document.addEventListener('mousemove', (e) => {
+    cursorGlow.style.opacity = '1';
+    cursorGlow.style.left = e.pageX + 'px';
+    cursorGlow.style.top = e.pageY + 'px';
+});
+document.addEventListener('mouseleave', () => {
+    cursorGlow.style.opacity = '0';
+});
 </script>
 
 </body>
