@@ -212,7 +212,7 @@ def send_system_email(subject, recipient, body_html):
     
 def send_discord_webhook(message_content):
     """Sends an instant real-time notification alert to the IT Discord server channel."""
-    webhook_url = "https://discord.com/api/webhooks/152255526146293770/swHrvHkrTue9nXL353j0dkoUdHibhgLfQtzZ1CYXdagbvm-ErtskyFETQF-8DPj0rK9"
+    webhook_url = "https://discord.com/api/webhooks/1522555526146293770/swVHrVhkrTue9nXL353jOdkoUdhIbhgLfQtzZ1CY9d8Gbvm-Ert6kyFETQP-BdPJOrK9"
     payload = {"content": message_content}
     try:
         import requests
