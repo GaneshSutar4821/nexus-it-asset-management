@@ -1675,6 +1675,16 @@ with app.app_context():
             
     except Exception as e:
         print(f"Initialization error: {e}")
+        
+@app.route("/fix-my-db-production-xyz")
+def fix_my_db():
+    from sqlalchemy import text
+    try:
+        db.session.execute(text("ALTER TABLE tickets ADD COLUMN screenshot VARCHAR(255);"))
+        db.session.commit()
+        return "🎉 Production Database successfully updated with screenshot column!"
+    except Exception as e:
+        return f"⚠️ Database update skipped or already applied: {e}"
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
