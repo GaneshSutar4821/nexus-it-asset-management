@@ -6,6 +6,7 @@ from io import BytesIO
 from functools import wraps
 import shutil
 import threading
+import requests
 
 from flask import Flask, render_template, request, redirect, send_file, url_for, abort, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
@@ -263,16 +264,26 @@ def ai_analyze_ticket(issue_summary, fault_description):
         print(f"AI Engine offline: {e}")
         return "AI Triage currently unavailable."
     
-def send_discord_webhook(message_content):
-    """Sends an instant real-time notification alert to the IT Discord server channel."""
+def send_discord_webhook(message, file_path=None):
     webhook_url = "https://discord.com/api/webhooks/1522555526146293770/swVHrVhkrTue9nXL353jOdkoUdhIbhgLfQtzZ1CY9d8Gbvm-Ert6kyFETQP-BdPJOrK9"
-    payload = {"content": message_content}
+    # Prepare the textual content payload
+    payload = {"content": message}
+    
     try:
-        import requests
-        requests.post(webhook_url, json=payload, timeout=5)
-        print("🚀 Discord webhook alert transmitted successfully!")
+        # If there is an image to attach, send it as multi-part form data
+        if file_path and os.path.exists(file_path):
+            with open(file_path, 'rb') as f:
+                files = {'file': (os.path.basename(file_path), f, 'image/png')}
+                # When files are attached, data must be sent via 'data' instead of 'json'
+                response = requests.post(webhook_url, data=payload, files=files)
+        else:
+            # If no image, send it as a standard light JSON request
+            response = requests.post(webhook_url, json=payload)
+            
+        if response.status_code not in [200, 204]:
+            print(f"⚠️ Discord Webhook failed with status code: {response.status_code}")
     except Exception as e:
-        print(f"⚠️ Webhook integration failure: {str(e)}")
+        print(f"❌ Error dispatching Discord webhook: {e}")
 
 # Login Page
 @app.route("/", methods=["GET", "POST"])
@@ -876,7 +887,13 @@ def tickets():
             
             # 🌟 TRIGGER INSTANT DISCORD DISPATCH
             discord_message = f"🚨 **CRITICAL TICKET ALERT [{new_ticket.ticket_id}]**\n• **Asset ID:** {asset_id}\n• **Issue:** {new_ticket.issue}\n• **Reported By:** {current_user.name}\n\n*Please check the management console immediately.*"
-            send_discord_webhook(discord_message)
+            # Calculate the full folder location of the saved image file
+            full_image_path = None
+            if screenshot_filename:
+                full_image_path = os.path.join(app.config['UPLOAD_FOLDER'], screenshot_filename)
+            
+            # Send the text message AND the image attachment path together
+            send_discord_webhook(discord_message, file_path=full_image_path)
             
             # --- TEMPORARY AI TEST LINE ---
             ai_test_result = ai_analyze_ticket(request.form.get('issue'), request.form.get('description'))
