@@ -71,6 +71,17 @@ app.config['MAIL_DEFAULT_SENDER'] = ('Nexus IT System', app.config['MAIL_USERNAM
 
 mail = Mail(app)
 
+# --- AUTOMATIC PRODUCTION DATABASE MIGRATION PATCH ---
+with app.app_context():
+    from sqlalchemy import text
+    try:
+        db.session.execute(text("ALTER TABLE tickets ADD COLUMN screenshot VARCHAR(255);"))
+        db.session.commit()
+        print("🚀 PRODUCTION DATABASE AUTO-PATCHED SUCCESSFULLY!")
+    except Exception as e:
+        # If the column already exists, it will safely skip without crashing
+        print(f"ℹ️ Database auto-patch skipped or already applied: {e}")
+
 # --- CONFIGURING THE ENCRYPTION INTEGRATIONS ---
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -1675,16 +1686,6 @@ with app.app_context():
             
     except Exception as e:
         print(f"Initialization error: {e}")
-        
-@app.route("/fix-my-db-production-xyz")
-def fix_my_db():
-    from sqlalchemy import text
-    try:
-        db.session.execute(text("ALTER TABLE tickets ADD COLUMN screenshot VARCHAR(255);"))
-        db.session.commit()
-        return "🎉 Production Database successfully updated with screenshot column!"
-    except Exception as e:
-        return f"⚠️ Database update skipped or already applied: {e}"
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
