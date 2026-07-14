@@ -247,94 +247,115 @@
 
     {% if role == 'User' %}
     <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 20px; align-items: start;">
-    {% else %}
-    <div style="display: grid; grid-template-columns: 1fr; gap: 20px; align-items: start;">
-    {% endif %}
-    
-        <div class="section-layout">
-            <h3 class="section-title">🚀 File a Support Request</h3>
-            <form action="/tickets" method="POST">
-                <div style="margin-bottom: 12px;">
-                    <label>Target Asset ID:</label>
-                    <input list="assets_list" name="asset_id" placeholder="Select or type Asset ID..." required>
-                    <datalist id="assets_list">
-                        {% for aid in asset_ids %}
-                        <option value="{{ aid }}"></option>
-                        {% endfor %}
-                    </datalist>
-                </div>
+        {% else %}
+        <div style="display: grid; grid-template-columns: 1fr; gap: 20px; align-items: start;">
+            {% endif %}
 
-                <div style="margin-bottom: 12px;">
-                    <label>Core Issue Summary:</label>
-                    <input type="text" name="issue" placeholder="e.g., Laptop Screen Flickering" required>
-                </div>
+            <div class="section-layout">
+                <h3 class="section-title">🚀 File a Support Request</h3>
+                <form action="/tickets" method="POST" enctype="multipart/form-data">
+                    <div style="margin-bottom: 12px;">
+                        <label>Target Asset ID:</label>
+                        <input list="assets_list" name="asset_id" placeholder="Select or type Asset ID..." required>
+                        <datalist id="assets_list">
+                            {% for aid in asset_ids %}
+                            <option value="{{ aid }}"></option>
+                            {% endfor %}
+                        </datalist>
+                    </div>
 
-                <div style="margin-bottom: 12px;">
-                    <label>Priority Level:</label>
-                    <select name="priority">
-                        <option value="Low">Low</option>
-                        <option value="Medium" selected>Medium</option>
-                        <option value="High">High</option>
-                    </select>
-                </div>
+                    <div style="margin-bottom: 12px;">
+                        <label>Core Issue Summary:</label>
+                        <input type="text" name="issue" placeholder="e.g., Laptop Screen Flickering" required>
+                    </div>
 
-                <div style="margin-bottom: 12px;">
-                    <label>Detailed Description of Fault:</label>
-                    <textarea name="description" rows="4" placeholder="Describe the error or failure parameters here..." required></textarea>
-                </div>
+                    <div style="margin-bottom: 12px;">
+                        <label>Priority Level:</label>
+                        <select name="priority">
+                            <option value="Low">Low</option>
+                            <option value="Medium" selected>Medium</option>
+                            <option value="High">High</option>
+                        </select>
+                    </div>
 
-                <button type="submit" class="submit-btn" style="width: 100%;">Submit Ticket to IT Support</button>
-            </form>
-        </div>
+                    <div style="margin-bottom: 12px;">
+                        <label>Detailed Description of Fault:</label>
+                        <textarea name="description" rows="4"
+                            placeholder="Describe the error or failure parameters here..." required></textarea>
+                    </div>
 
-        <div class="section-layout">
-            <h3 class="section-title">📋 Current Active Tickets Registry</h3>
+                    <div style="margin-bottom: 12px;">
+                        <label>Upload Screenshot (Optional):</label>
+                        <input type="file" name="screenshot" accept="image/*">
+                    </div>
 
-            <div style="overflow-x: auto;">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Ticket ID</th>
-                            <th>Asset ID</th>
-                            <th>Issue</th>
-                            <th>Raised By</th>
-                            <th>Priority</th>
-                            <th>Status</th>
-                            <th>Last Updated</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for tkt in tickets %}
-                        {% if role in ['Admin', 'Technician'] or tkt['Raised By'] == current_user.name %}
-                        <tr>
-                            <td><strong>{{ tkt['Ticket ID'] }}</strong></td>
-                            <td>{{ tkt['Asset ID'] }}</td>
-                            <td>{{ tkt['Issue'] }}</td>
-                            <td>{{ tkt['Raised By'] }}</td>
-                            <td>
-                                <span class="{% if tkt['Priority'] == 'High' %}priority-high{% endif %}">
-                                    {{ tkt['Priority'] }}
-                                </span>
-                            </td>
-                            <td>
-                                <span class="badge {% if tkt['Status'] == 'Open' %}badge-open{% elif tkt['Status'] == 'In Progress' %}badge-progress{% else %}badge-closed{% endif %}">
-                                    {{ tkt['Status'] }}
-                                </span>
-                            </td>
-                            <td><small>{{ tkt['Last Updated'] }}</small></td>
-                            <td>
-                                <a href="/ticket/{{ tkt['Ticket ID'] }}" class="action-link">
-                                    {% if role in ['Admin', 'Technician'] %}🔧 Respond / Update{% else %}👀 View Details{% endif %}
-                                </a>
-                            </td>
-                        </tr>
-                        {% endif %}
-                        {% endfor %}
-                    </tbody>
-                </table>
+                    <button type="submit" class="submit-btn" style="width: 100%;">Submit Ticket to IT Support</button>
+                </form>
             </div>
-        </div>
 
-    </div> </body>
+            <div class="section-layout">
+                <h3 class="section-title">📋 Current Active Tickets Registry</h3>
+
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Ticket ID</th>
+                                <th>Asset ID</th>
+                                <th>Issue</th>
+                                <th>Raised By</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                                <th>Last Updated</th>
+                                <th>Screenshot</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for tkt in tickets %}
+                            {% if role in ['Admin', 'Technician'] or tkt['Raised By'] == current_user.name %}
+                            <tr>
+                                <td><strong>{{ tkt['Ticket ID'] }}</strong></td>
+                                <td>{{ tkt['Asset ID'] }}</td>
+                                <td>{{ tkt['Issue'] }}</td>
+                                <td>{{ tkt['Raised By'] }}</td>
+                                <td>
+                                    <span class="{% if tkt['Priority'] == 'High' %}priority-high{% endif %}">
+                                        {{ tkt['Priority'] }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span
+                                        class="badge {% if tkt['Status'] == 'Open' %}badge-open{% elif tkt['Status'] == 'In Progress' %}badge-progress{% else %}badge-closed{% endif %}">
+                                        {{ tkt['Status'] }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if tkt['Screenshot'] %}
+                                    <a href="{{ url_for('static', filename='uploads/' + tkt['Screenshot']) }}"
+                                        target="_blank" style="color: #00bcd4; text-decoration: underline;">
+                                        🖼️ View Image
+                                    </a>
+                                    {% else %}
+                                    <span style="color: #6c757d;">No Image</span>
+                                    {% endif %}
+                                </td>
+                                <td><small>{{ tkt['Last Updated'] }}</small></td>
+                                <td>
+                                    <a href="/ticket/{{ tkt['Ticket ID'] }}" class="action-link">
+                                        {% if role in ['Admin', 'Technician'] %}🔧 Respond / Update{% else %}👀 View
+                                        Details{% endif %}
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+</body>
+
 </html>

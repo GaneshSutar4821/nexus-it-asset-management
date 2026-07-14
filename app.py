@@ -11,6 +11,7 @@ from flask import Flask, render_template, request, redirect, send_file, url_for,
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.utils import secure_filename
 import google.generativeai as genai
 
 from sqlalchemy import or_  # Imported safely for advanced database filtering
@@ -45,6 +46,20 @@ app.config['MAIL_USE_SSL'] = True
 # --- AI TRIAGE ENGINE CONFIGURATION ---
 gemini_api_key = os.environ.get('GEMINI_API_KEY')
 genai.configure(api_key=gemini_api_key)
+
+# --- FILE UPLOAD CONFIGURATION ---
+UPLOAD_FOLDER = 'static/uploads'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+# Limit file sizes to 5MB to protect your server storage
+app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024 
+
+# Automatically create the upload folder if it doesn't exist
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # AUTO-CLEAN VALUES TO REMOVE GHOST SPACES OR HIDDEN SYMBOLS
 raw_user = os.environ.get('SYSTEM_EMAIL_USER', '')
@@ -126,6 +141,7 @@ class TicketModel(db.Model):
     department = db.Column(db.String(100))
     notes = db.Column(db.Text)
     last_updated = db.Column(db.String(50))
+    screenshot = db.Column(db.String(255), nullable=True)  # Stores the filename of the uploaded screenshot
 
 class TransactionModel(db.Model):
     __tablename__ = 'transactions'
@@ -802,6 +818,19 @@ def tickets():
         target_asset = AssetModel.query.get(asset_id)
         dept = target_asset.department if target_asset else ""
 
+        # --- PHASE 4: FILE UPLOAD HANDLING ---
+        screenshot_filename = None
+        if 'screenshot' in request.files:
+            file = request.files['screenshot']
+            if file and file.filename != '' and allowed_file(file.filename):
+                import time
+                # Secure the filename against directory traversal hazards
+                base_filename = secure_filename(file.filename)
+                # Timestamp avoids naming conflicts if different users upload "error.png"
+                screenshot_filename = f"{int(time.time())}_{base_filename}"
+                # Save the physical image file to static/uploads/
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], screenshot_filename))
+
         new_ticket = TicketModel(
             ticket_id=ticket_id, 
             asset_id=asset_id,
@@ -815,11 +844,13 @@ def tickets():
             closed_date="-",
             last_updated=datetime.now().strftime("%d/%m/%Y %H:%M"),
             description=request.form.get("description", ""), 
-            notes=""
+            notes="",
+            screenshot=screenshot_filename  # <-- Links screenshot string to your DB column
         )
         db.session.add(new_ticket)
         add_transaction(asset_id, "Ticket Raised", f"Issue reported: {new_ticket.issue}")
         db.session.commit()
+        
         # 📧 If it's a critical issue, alert the Admin instantly!
         if request.form.get("priority", "Medium") == "High":
             admin_alert_body = f"""
@@ -863,7 +894,8 @@ def tickets():
             "Ticket ID": t.ticket_id, "Ticket_ID": t.ticket_id, "Asset ID": t.asset_id, "Issue": t.issue,
             "Raised By": t.raised_by, "Priority": t.priority, "Status": t.status, "Description": t.description,
             "Created Date": t.created_date, "Closed Date": t.closed_date, "Assigned To": t.assigned_to,
-            "Department": t.department, "Notes": t.notes, "Last Updated": t.last_updated
+            "Department": t.department, "Notes": t.notes, "Last Updated": t.last_updated,
+            "Screenshot": t.screenshot
         })
 
     asset_ids = [a.asset_id for a in AssetModel.query.filter(AssetModel.record_status != "DEL").all()]
@@ -876,7 +908,8 @@ def tickets():
         high_priority=high_priority, asset_ids=asset_ids, asset_data=asset_data,
         role=current_user.role, alert_count=alert_count
     )
-
+    
+    
 @app.route("/close_ticket/<ticket_id>")
 @login_required
 @role_required(['Admin', 'Technician'])
